@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="LionUtils:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/LionUtils_jar</output-path>
+    <root id="archive" name="LionUtils.jar">
+      <element id="module-output" name="LionUtils" />
+    </root>
+  </artifact>
+</component>

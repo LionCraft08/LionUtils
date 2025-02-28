@@ -1,0 +1,68 @@
+name: LionUtils
+version: '${project.version}'
+main: de.lioncraft.lionutils.Main
+api-version: '1.20'
+commands:
+  ping:
+    usage: /ping <Player>
+    description: Shows your current Ping.
+  inventory:
+    usage: /inv <Player>
+    permission: lionutils.inv.view
+    aliases: inv
+    description: Shows a Player's Inventory
+  status:
+    usage: /status [args]
+    description: Sets your Status.
+    permission: lionutils.status
+  lionsystems:
+    aliases:
+      - ls
+    permission: OP
+    description: Main Functions for LionUtils Plugin!
+    usage: /ls
+  flyspeed:
+    usage: /flyspeed [get|reset|NumberRange -10 .. 10]
+    permission: lionutils.flyspeed
+  statistics:
+    usage: /statistics get statistic args|null player
+    description: View Statistics of every Player.
+    aliases:
+      - stats
+    permission: OP
+  spectator:
+    usage: /spectator [args]
+    description: Enables advanced Spectator mode.
+    permission: lionutils.spectator.enable
+permissions:
+  lionutils.inv.view:
+    default: op
+    description: Allows Players to view other Inventories
+  lionutils.inv.edit:
+    default: op
+    description: Allows players to take Items out of other's Inventories
+    children:
+      - lionutils.inv.view
+  lionutils.flyspeed:
+    default: true
+    description: Weather Players can change their flyspeed.
+  lionutils.status:
+    default: true
+    description: Weather Players can use the Status GUI.
+  lionutils.status.editglobal:
+    default: op
+    description: Weather a Player can edit the Global available Status List.
+    children:
+      - lionutils.status
+  lionutils.spectator.enable:
+    default: op
+    description: Allows Players to enable the advanced Spectator Mode.
+  lionutils.spectator.vanilla:
+    default: op
+    description: Allows Players in Spectator Mode to switch to the Vanilla mode.
+    children:
+      - lionutils.spectator.enable
+
+
+depend:
+  - lionAPI

@@ -1,0 +1,37 @@
+inventory-view:
+  allow-changes: true
+  update: true
+advanced-spectator:
+  allow-world-interactions: true
+modts:
+  withonlineplayers:
+    - '%playername% mag Züge!'
+    - '%playername% wurde gerade von Delfinen getötet!'
+    - '%playername% mag keine Tomaten!'
+    - 'Vorsicht vor %playername%!'
+    - 'Leg dich niemals mit %playername% an!'
+    - '%playername% spielt League of Legends!'
+    - '%playername% mag Phantome'
+    - '%playername% isst gerade Brokkoli!'
+    - '%playername% kann nicht bauen...'
+  noonlineplayers:
+    - Schlechte Laune wird hier nicht toleriert!
+    - 1+2+3 = 1*2*3
+    - English or Spanish?
+    - Rollt eine Kugel um die Ecke und fällt um!
+    - Minecraft is cool!
+    - Sport ist gesund!
+    - MEINE CHICKEN NUGGETS VERBRENNEN!!!
+    - Ist das ihr Kontostand oder ihre IBAN?
+    - Work hard dream big!
+    - Manchmal ist ein Block mehr als nur ein Block
+    - Also try Terraria
+    - Liebe auf den ersten Block
+    - Ich kam, sah, und vergaß was ich vorhatte.
+    - Je weniger man zuhört, desto professioneller sollte man nicken!
+settings:
+  block-to-expensive: false
+  status:
+    #Time in Seconds until AFK gets displayed as Status.
+    afktimer: 120
+    enabled-by-default: true
