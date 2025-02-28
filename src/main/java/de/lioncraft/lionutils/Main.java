@@ -47,7 +47,6 @@ public final class Main extends JavaPlugin {
         getCommand("lionsystems").setExecutor(new DefaultCommand());
         getCommand("flyspeed").setExecutor(new Flyspeed());
         getCommand("statistics").setExecutor(new StatsCommand());
-        getCommand("spectator").setExecutor(new );
 
         Settings.deserializeAll();
         de.lioncraft.lionutils.utils.status.StatusSettings.deserializeAll();
