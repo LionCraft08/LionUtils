@@ -17,6 +17,8 @@ public class DamageDisplayListeners implements Listener {
     public void onDamage(EntityDamageEvent e){
         if(e.getEntity() instanceof Player p){
             if(DamageDisplay.getDamageDisplay().isChatActive()){
+                if (e.getFinalDamage() <= 0) return;
+
                 Component health = Component.text("");
                 Component cause = Component.text("");
                 Component heart = Component.text("\uD83D\uDC94", TextColor.color(255, 107, 111));
@@ -37,7 +39,7 @@ public class DamageDisplayListeners implements Listener {
                     }else cause = cause.append(Component.translatable(e.getDamageSource().getDamageType().getTranslationKey()));
                 }
                 Component prefix = Component.text("[", white).append(Component.text("DMG", TextColor.color(255, 128, 0))).append(Component.text("] ", white));
-                Component c = prefix.append(p.displayName().append(health).append(Component.text(" hat ", white).append(heart).append(Component.text(getRoundedValue(e.getFinalDamage())).append(Component.text(" Schaden ", white).append(cause).append(Component.text(" bekommen.", white))))));
+                Component c = prefix.append(p.displayName().append(health).append(Component.text(": ", white).append(heart).append(Component.text(getRoundedValue(e.getFinalDamage())).append(Component.text(" -> ", white).append(cause)))));
                 Bukkit.broadcast(c);
             }
         }

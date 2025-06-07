@@ -1,6 +1,7 @@
 package de.lioncraft.lionutils.inventories;
 
 import de.lioncraft.lionapi.guimanagement.Interaction.Button;
+import de.lioncraft.lionapi.guimanagement.Interaction.Setting;
 import de.lioncraft.lionapi.guimanagement.Items;
 import de.lioncraft.lionapi.messageHandling.DM;
 import net.kyori.adventure.text.Component;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 public final class opUtils {
+    private static boolean sharedHearts;
     private opUtils(){}
     private static Inventory inv;
     public static void openUI(HumanEntity player){
@@ -37,7 +39,7 @@ public final class opUtils {
             }
             if(inventoryClickEvent.getWhoClicked() instanceof Player p){
                 p.sendMessage(DM.info("You have healed " + i + " Players!"));
-                p.playSound(p, Sound.ENTITY_ILLUSIONER_MIRROR_MOVE, 0.5f, 1.0f);
+                p.playSound(p, Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 1.5f);
             }
         return false;});
         inv.setItem(10, heal.getButton());
@@ -59,6 +61,10 @@ public final class opUtils {
             }
         return false;});
         inv.setItem(12, tp.getButton());
+        Button b = new Button(Items.get("Challenges", Material.DIAMOND_SWORD, "Different small Challenges"), e ->{
+            ChallengesGUI.open((Player) e.getWhoClicked());
+        return false;});
+        inv.setItem(14, b.getButton());
     }
     public static void heal(Player p){
         p.setHealth(20);

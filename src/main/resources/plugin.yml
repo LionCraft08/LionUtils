@@ -2,6 +2,7 @@ name: LionUtils
 version: '${project.version}'
 main: de.lioncraft.lionutils.Main
 api-version: '1.20'
+load: STARTUP
 commands:
   ping:
     usage: /ping <Player>
@@ -34,6 +35,10 @@ commands:
     usage: /spectator [args]
     description: Enables advanced Spectator mode.
     permission: lionutils.spectator.enable
+  reset:
+    permission: OP
+    usage: /reset
+    description: Reset the Server! Use carefully!
 permissions:
   lionutils.inv.view:
     default: op

@@ -1,6 +1,12 @@
 inventory-view:
   allow-changes: true
   update: true
+advanced-spectator:
+  allow-world-interactions: true
+
+  #Mainly used by the reset Command, may get changed during runtime, however, value can be manually changed.
+delete-worlds-on-startup: false
+
 modts:
   withonlineplayers:
     - '%playername% mag Züge!'
@@ -33,3 +39,8 @@ settings:
     #Time in Seconds until AFK gets displayed as Status.
     afktimer: 120
     enabled-by-default: true
+
+#Used to find Worlds before Server startup
+detected-worlds:
+
+files-to-reset:

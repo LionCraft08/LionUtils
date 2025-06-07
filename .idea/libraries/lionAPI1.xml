@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="lionAPI1">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../lionAPI/out/artifacts/lionAPI_jar/lionAPI.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

@@ -3,6 +3,7 @@ package de.lioncraft.lionutils.listeners;
 import de.lioncraft.lionapi.events.saveDataEvent;
 import de.lioncraft.lionapi.messageHandling.DM;
 import de.lioncraft.lionapi.messageHandling.defaultMessages;
+import de.lioncraft.lionutils.data.ChallengesData;
 import de.lioncraft.lionutils.inventories.PlayerSettingsGUI;
 import de.lioncraft.lionutils.utils.Settings;
 import de.lioncraft.lionutils.utils.status.StatusSettings;
@@ -98,6 +99,8 @@ public class SettingsListeners implements Listener {
                 StatusSettings.serializeAll();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
+            }finally {
+                ChallengesData.save();
             }
         }
 

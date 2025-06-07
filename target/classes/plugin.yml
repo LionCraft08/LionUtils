@@ -2,6 +2,7 @@ name: LionUtils
 version: '1.0'
 main: de.lioncraft.lionutils.Main
 api-version: '1.20'
+load: STARTUP
 commands:
   ping:
     usage: /ping <Player>
@@ -30,6 +31,14 @@ commands:
     aliases:
       - stats
     permission: OP
+  spectator:
+    usage: /spectator [args]
+    description: Enables advanced Spectator mode.
+    permission: lionutils.spectator.enable
+  reset:
+    permission: OP
+    usage: /reset
+    description: Reset the Server! Use carefully!
 permissions:
   lionutils.inv.view:
     default: op
@@ -50,5 +59,15 @@ permissions:
     description: Weather a Player can edit the Global available Status List.
     children:
       - lionutils.status
+  lionutils.spectator.enable:
+    default: op
+    description: Allows Players to enable the advanced Spectator Mode.
+  lionutils.spectator.vanilla:
+    default: op
+    description: Allows Players in Spectator Mode to switch to the Vanilla mode.
+    children:
+      - lionutils.spectator.enable
+
+
 depend:
   - lionAPI
