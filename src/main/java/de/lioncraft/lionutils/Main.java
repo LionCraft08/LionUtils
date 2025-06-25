@@ -1,14 +1,22 @@
 package de.lioncraft.lionutils;
 
+import de.lioncraft.lionapi.guimanagement.Interaction.Button;
+import de.lioncraft.lionapi.guimanagement.Items;
+import de.lioncraft.lionapi.guimanagement.MainMenu;
 import de.lioncraft.lionutils.data.ChallengesData;
 import de.lioncraft.lionutils.inventories.DamageDisplay;
 import de.lioncraft.lionutils.commands.*;
 import de.lioncraft.lionutils.commands.Status;
+import de.lioncraft.lionutils.inventories.opUtils;
 import de.lioncraft.lionutils.listeners.*;
 import de.lioncraft.lionutils.utils.ResetUtils;
 import de.lioncraft.lionutils.utils.Settings;
 import de.lioncraft.lionutils.utils.status.*;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -58,6 +66,24 @@ public final class Main extends JavaPlugin {
         getCommand("flyspeed").setExecutor(new Flyspeed());
         getCommand("statistics").setExecutor(new StatsCommand());
         getCommand("reset").setExecutor(new ResetCommand());
+
+
+        Button status = new Button(Items.get("Status", Material.NAME_TAG, "Click to configure your status."), inventoryClickEvent -> {
+            Inventories.openMainMenu((Player) inventoryClickEvent.getWhoClicked());
+            return false;});
+        MainMenu.setButton(14, status);
+        if(Bukkit.getPluginManager().isPluginEnabled("LionWaypoints")){
+            Button wp = new Button(Items.get(Component.text("LionWaypoints"), Material.RECOVERY_COMPASS, "Click to open the Waypoint Menu"), inventoryClickEvent -> {
+                ((Player)inventoryClickEvent.getWhoClicked()).performCommand("wp");
+                return false;});
+
+            MainMenu.setButton(16, wp);
+        }
+        Button openOpUtils = new Button(Items.get(Component.text("OPUtils"), Material.COMPARATOR, "Some useful stuff for Operators"), e -> {
+            if (((Player)e.getWhoClicked()).isOp()) opUtils.openUI(e.getWhoClicked());
+            return false;});
+        MainMenu.setButton(53, openOpUtils);
+
     }
 
 

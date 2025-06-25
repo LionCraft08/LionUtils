@@ -16,7 +16,6 @@ public class DefaultCommand implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(sender instanceof Player p){
-
             if(args.length > 0){
                 sender.sendMessage(DM.messagePrefix.append(Component.text("Beta Features not available!")));
             }else{
