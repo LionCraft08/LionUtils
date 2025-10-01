@@ -24,7 +24,7 @@ public final class ChallengesGUI {
         inv = Bukkit.createInventory(null, 54, Component.text("Challenges"));
         inv.setContents(Items.blockButtons);
         Button back = new Button(Items.getBackButton("Operator Utils"), e -> {
-            opUtils.openUI(e.getWhoClicked());
+            opUtils.openUI((Player) e.getWhoClicked());
         return false;});
         inv.setItem(45, back.getButton());
         Setting s = new Setting(ChallengesData.getInstance().isSharedHearts(), Items.get("Shared Hearts", Material.LEAD, "Geteilte Herzen innerhalb eines Teams"), b -> {

@@ -1,8 +1,12 @@
 package de.lioncraft.lionutils.inventories;
 
 import de.lioncraft.lionapi.guimanagement.Interaction.Button;
+import de.lioncraft.lionapi.guimanagement.Interaction.LionButtonFactory;
 import de.lioncraft.lionapi.guimanagement.Interaction.Setting;
 import de.lioncraft.lionapi.guimanagement.Items;
+import de.lioncraft.lionapi.guimanagement.MainMenu;
+import de.lioncraft.lionapi.messageHandling.MSG;
+import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
 import de.lioncraft.lionutils.Main;
 import io.papermc.paper.scoreboard.numbers.NumberFormat;
 import net.kyori.adventure.text.Component;
@@ -20,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.Key;
 import java.util.Map;
 
 
@@ -30,10 +35,7 @@ public final class DamageDisplay implements ConfigurationSerializable {
         GUI = Bukkit.createInventory(null, 54, Component.text("Damage Display Config", TextColor.color(255, 128, 0)));
         GUI.setContents(Items.blockButtons);
         GUI.setItem(49, Items.closeButton);
-        Button back = new Button(Items.getBackButton("Main GUI"), inventoryClickEvent -> {
-            MainGUI.open(inventoryClickEvent.getWhoClicked());
-        return false;});
-        GUI.setItem(45, back.getButton());
+        GUI.setItem(45, MainMenu.getToMainMenuButton());
         Setting tabList = new Setting(damageDisplay.isTabListActive(), Items.get(Component.text("TabList Display", TextColor.color(255, 128, 0)), Material.PAPER, "Click to toggle the Damage ", "Display in the Player List"), b -> {
             damageDisplay.setTabListActive(b);
         });
@@ -59,20 +61,28 @@ public final class DamageDisplay implements ConfigurationSerializable {
         });
         GUI.setItem(13, isHearts.getTopItem());
         GUI.setItem(22, isHearts.getBottomItem());
-        Button update = new Button(Items.get("Reload", Material.HEART_OF_THE_SEA, "Click to reload the Tab List"), inventoryClickEvent -> {
-            Component c = damageDisplay.updateTabList();
-            if(inventoryClickEvent.getWhoClicked() instanceof Player p){
-                p.sendMessage(c);
-            }
-            if(inventoryClickEvent.getWhoClicked() instanceof Player p){
-                p.playSound(p, Sound.UI_BUTTON_CLICK, 1.0f, 1.0f);
-            }
-        return false;});
-        GUI.setItem(53, update.getButton());
+        GUI.setItem(53, LionButtonFactory.createButton(Items.get("Reload", Material.HEART_OF_THE_SEA, "Click to reload the Tab List"),
+                "lionutils_update_tablist"));
 
+        MainMenu.setButton(22, LionButtonFactory.createButton(Items.get(Component.text("Damage Display", TextColor.color(255, 128, 0)),
+                Material.HEART_POTTERY_SHERD, "Click to open a Menu to ", "configure the Health Display Settings"),
+                "lionutils_open_health_display_settings"));
+
+        Bukkit.getScheduler().runTaskTimer(Main.getPlugin(), () -> {
+            if (damageDisplay.isTabListActive()){
+                Objective o = Bukkit.getScoreboardManager().getMainScoreboard().getObjective("hp");
+                if (o == null) return;
+                for (Player p : Bukkit.getOnlinePlayers()){
+                    if (((int)Math.ceil(p.getHealth())) != o.getScore(p).getScore()){
+                        o.getScore(p).setScore((int)Math.ceil(p.getHealth()));
+                    }
+                }
+            }
+        }, 500L, 200L);
     }
     public static void open(HumanEntity player){
-        player.openInventory(GUI);
+        if (player.isOp()) player.openInventory(GUI);
+        else LionChat.sendSystemMessage(MSG.noPermission, player);
     }
     public static void deserialize(){
         YamlConfiguration yml = getConfig();
@@ -142,14 +152,17 @@ public final class DamageDisplay implements ConfigurationSerializable {
         Objective o = sc.getObjective("hp");
         if(tabListActive){
             if(o == null){
-                o = sc.registerNewObjective("hp", Criteria.HEALTH, Component.text("Health", TextColor.color(255, 0, 0)), RenderType.HEARTS);
-                o.setDisplaySlot(DisplaySlot.PLAYER_LIST);
-                o.numberFormat(NumberFormat.noStyle());
-
-                updateTabList();
+                o = sc.registerNewObjective("hp", Criteria.DUMMY, Component.text("Health", TextColor.color(255, 0, 0)), RenderType.HEARTS);
             }
+            o.setDisplaySlot(DisplaySlot.PLAYER_LIST);
+            o.numberFormat(NumberFormat.noStyle());
+            updateTabList();
         }else{
-            if(o != null) o.unregister();
+            if(o != null){
+                o.setDisplaySlot(null);
+                o.unregister();
+            }
+            sc.clearSlot(DisplaySlot.PLAYER_LIST);
         }
     }
     public Component updateTabList(){
@@ -160,16 +173,22 @@ public final class DamageDisplay implements ConfigurationSerializable {
                 return Component.text("TabList Damage Display is currently not active!");
             }
             for(Player p : Bukkit.getOnlinePlayers()){
-                p.sendHealthUpdate();
-                Score score = o.getScore(p);
-                if (!score.isScoreSet()) {
-                    double d = p.getHealth();
-                    p.setHealth(d);
-                }
+                updateTabList(p);
             }
             return Component.text("Updated the Display!");
         }
         return Component.text("TabList Damage Display is currently not active!");
+    }
+    public void updateTabList(Player p){
+        Scoreboard sc = Bukkit.getScoreboardManager().getMainScoreboard();
+        Objective o = sc.getObjective("hp");
+        if (o == null) return;
+        o.getScore(p).setScore((int) Math.ceil(p.getHealth()));
+    }
+    public void updateTabListDelayed(Player p){
+        Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
+            updateTabList(p);
+        }, 1L);
     }
     public boolean isChatShowCause() {
         return chatShowCause;

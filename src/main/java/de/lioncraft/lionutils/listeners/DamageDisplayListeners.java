@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 
 public class DamageDisplayListeners implements Listener {
@@ -51,7 +52,21 @@ public class DamageDisplayListeners implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e){
         if(DamageDisplay.getDamageDisplay().isTabListActive()){
-            DamageDisplay.getDamageDisplay().updateTabList();
+            DamageDisplay.getDamageDisplay().updateTabListDelayed(e.getPlayer());
         }
+    }
+    @EventHandler
+    public void onJoin(EntityRegainHealthEvent e){
+        if (e.getEntity() instanceof Player p)
+            if(DamageDisplay.getDamageDisplay().isTabListActive()){
+                DamageDisplay.getDamageDisplay().updateTabListDelayed(p);
+            }
+    }
+    @EventHandler
+    public void onJoin(EntityDamageEvent e){
+        if (e.getEntity() instanceof Player p)
+            if(DamageDisplay.getDamageDisplay().isTabListActive()){
+                DamageDisplay.getDamageDisplay().updateTabListDelayed(p);
+            }
     }
 }

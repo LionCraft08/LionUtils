@@ -206,6 +206,7 @@ public class Status implements ConfigurationSerializable {
             return true;});
         return b.getButton();
     }
+
     public void update(){
         OfflinePlayer player = getPlayer();
         if(player != null){
@@ -217,6 +218,7 @@ public class Status implements ConfigurationSerializable {
             }
         }
     }
+
     public String getRawContent(int part){
         return list.get(part).getContent();
     }

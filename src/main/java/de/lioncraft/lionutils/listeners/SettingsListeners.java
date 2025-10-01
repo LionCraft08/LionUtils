@@ -3,6 +3,7 @@ package de.lioncraft.lionutils.listeners;
 import de.lioncraft.lionapi.events.saveDataEvent;
 import de.lioncraft.lionapi.messageHandling.DM;
 import de.lioncraft.lionapi.messageHandling.defaultMessages;
+import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
 import de.lioncraft.lionutils.data.ChallengesData;
 import de.lioncraft.lionutils.inventories.PlayerSettingsGUI;
 import de.lioncraft.lionutils.utils.Settings;
@@ -21,6 +22,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLocaleChangeEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.meta.SkullMeta;
@@ -34,9 +36,10 @@ public class SettingsListeners implements Listener {
     public void onChat(AsyncChatEvent e){
         if (!Settings.getSettings(e.getPlayer()).canChat()) {
             e.setCancelled(true);
-            e.getPlayer().sendMessage(DM.messagePrefix.append(Component.text("You are not allowed to send Chat Messages!", TextColor.color(255, 128, 0))));
+            LionChat.sendError("You are not allowed to chat!", e.getPlayer());
         }
     }
+
     @EventHandler
     public void onMove(PlayerMoveEvent e){
         if (!Settings.getSettings(e.getPlayer()).canMove()) {
@@ -45,6 +48,7 @@ public class SettingsListeners implements Listener {
             }
         }
     }
+
     @EventHandler
     public void onMove(BlockBreakEvent e){
         if (!Settings.getSettings(e.getPlayer()).canMineBlocks()) {

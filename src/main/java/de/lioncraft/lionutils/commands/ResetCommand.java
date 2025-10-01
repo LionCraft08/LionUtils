@@ -1,6 +1,7 @@
 package de.lioncraft.lionutils.commands;
 
 import de.lioncraft.lionapi.messageHandling.DM;
+import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
 import de.lioncraft.lionutils.utils.ResetUtils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -22,18 +23,19 @@ public class ResetCommand implements TabExecutor {
         if(args.length >= 1){
             switch (args[0]){
                 case "all" -> {
-                    sender.sendMessage(DM.messagePrefix.append(Component.text("WARNING! This command will reset the whole server including the map and Player Inventories! Click ", TextColor.color(255, 128, 0)).append(Component.text("here", TextColor.color(255, 0, 255)).clickEvent(ClickEvent.runCommand("/reset confirm"))).append(Component.text(" to resume", TextColor.color(255, 128, 0)))));
+                    LionChat.sendSystemMessage(Component.text("WARNING! This command will reset the whole server including the map and Player Inventories! Click ", TextColor.color(255, 128, 0)).append(Component.text("here", TextColor.color(255, 0, 255)).clickEvent(ClickEvent.runCommand("/reset confirm"))).append(Component.text(" to resume", TextColor.color(255, 128, 0))), sender);
                 }
-                case "world" -> sender.sendMessage(DM.messagePrefix.append(Component.text("WARNING! This command will reset the map (overworld, nether, end)! Click ", TextColor.color(255, 128, 0)).append(Component.text("here", TextColor.color(255, 0, 255)).clickEvent(ClickEvent.runCommand("/reset confirmworld"))).append(Component.text(" to resume", TextColor.color(255, 128, 0)))));
-                case "players" -> sender.sendMessage(DM.messagePrefix.append(Component.text("WARNING! This command will reset every Player Inventory! Click ", TextColor.color(255, 128, 0)).append(Component.text("here", TextColor.color(255, 0, 255)).clickEvent(ClickEvent.runCommand("/reset confirmplayer"))).append(Component.text(" to resume", TextColor.color(255, 128, 0)))));
+                case "world" -> LionChat.sendSystemMessage(Component.text("WARNING! This command will reset the map (overworld, nether, end)! Click ", TextColor.color(255, 128, 0)).append(Component.text("here", TextColor.color(255, 0, 255)).clickEvent(ClickEvent.runCommand("/reset confirmworld"))).append(Component.text(" to resume", TextColor.color(255, 128, 0))), sender);
+                case "players" -> LionChat.sendSystemMessage(Component.text("WARNING! This command will reset every Player Inventory! Click ", TextColor.color(255, 128, 0)).append(Component.text("here", TextColor.color(255, 0, 255)).clickEvent(ClickEvent.runCommand("/reset confirmplayer"))).append(Component.text(" to resume", TextColor.color(255, 128, 0))), sender);
                 case "environment" -> {
                     World w = Bukkit.getServer().getWorld("world");
                 }
                 case "confirm"->{
                     ResetUtils.resetAll();
                 }
-
-
+                case "confirmplayer"->{
+                    ResetUtils.resetPlayerData();
+                }
             }
         }else sender.sendMessage(DM.messagePrefix.append(Component.text("WARNING! This command will reset the whole server including the map and Player Inventories! Click ", TextColor.color(255, 128, 0)).append(Component.text("here", TextColor.color(255, 0, 255)).clickEvent(ClickEvent.runCommand("/reset confirm"))).append(Component.text(" to resume", TextColor.color(255, 128, 0)))));
         return true;

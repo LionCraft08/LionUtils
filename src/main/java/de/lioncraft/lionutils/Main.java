@@ -1,14 +1,19 @@
 package de.lioncraft.lionutils;
 
+import de.lioncraft.lionapi.addons.AddonManager;
 import de.lioncraft.lionapi.guimanagement.Interaction.Button;
+import de.lioncraft.lionapi.guimanagement.Interaction.LionButtonFactory;
 import de.lioncraft.lionapi.guimanagement.Items;
 import de.lioncraft.lionapi.guimanagement.MainMenu;
+import de.lioncraft.lionapi.velocity.connections.ConnectionManager;
+import de.lioncraft.lionutils.addons.CommandUtilsAddon;
 import de.lioncraft.lionutils.data.ChallengesData;
 import de.lioncraft.lionutils.inventories.DamageDisplay;
 import de.lioncraft.lionutils.commands.*;
 import de.lioncraft.lionutils.commands.Status;
 import de.lioncraft.lionutils.inventories.opUtils;
 import de.lioncraft.lionutils.listeners.*;
+import de.lioncraft.lionutils.utils.GUIElementRenderer;
 import de.lioncraft.lionutils.utils.ResetUtils;
 import de.lioncraft.lionutils.utils.Settings;
 import de.lioncraft.lionutils.utils.status.*;
@@ -22,8 +27,12 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public final class Main extends JavaPlugin {
 
@@ -58,31 +67,30 @@ public final class Main extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new DamageDisplayListeners(), this);
         getServer().getPluginManager().registerEvents(new StartupListener(), this);
         getServer().getPluginManager().registerEvents(new SharedHeartsListeners(), this);
+        getServer().getPluginManager().registerEvents(new LionButtonListeners(), this);
 
         getCommand("ping").setExecutor(new Ping());
         getCommand("inventory").setExecutor(new Inv());
         getCommand("status").setExecutor(new Status());
-        getCommand("lionsystems").setExecutor(new DefaultCommand());
         getCommand("flyspeed").setExecutor(new Flyspeed());
         getCommand("statistics").setExecutor(new StatsCommand());
         getCommand("reset").setExecutor(new ResetCommand());
 
+        AddonManager.registerAddon(CommandUtilsAddon.getInstance());
 
-        Button status = new Button(Items.get("Status", Material.NAME_TAG, "Click to configure your status."), inventoryClickEvent -> {
-            Inventories.openMainMenu((Player) inventoryClickEvent.getWhoClicked());
-            return false;});
-        MainMenu.setButton(14, status);
-        if(Bukkit.getPluginManager().isPluginEnabled("LionWaypoints")){
-            Button wp = new Button(Items.get(Component.text("LionWaypoints"), Material.RECOVERY_COMPASS, "Click to open the Waypoint Menu"), inventoryClickEvent -> {
-                ((Player)inventoryClickEvent.getWhoClicked()).performCommand("wp");
-                return false;});
 
-            MainMenu.setButton(16, wp);
-        }
-        Button openOpUtils = new Button(Items.get(Component.text("OPUtils"), Material.COMPARATOR, "Some useful stuff for Operators"), e -> {
-            if (((Player)e.getWhoClicked()).isOp()) opUtils.openUI(e.getWhoClicked());
-            return false;});
-        MainMenu.setButton(53, openOpUtils);
+        MainMenu.setButton(14, LionButtonFactory.createButton(Items.get("Status", Material.NAME_TAG, "Click to configure your status."),
+                "lionutils_open_status_menu"));
+        MainMenu.setButton(53, LionButtonFactory.createButton(Items.get(Component.text("OPUtils"), Material.COMPARATOR, "Some useful stuff for Operators"),
+                "lionutils_open_op_utils"));
+
+
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+            if (ConnectionManager.isConnectedToVelocity()) return;
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                p.sendPlayerListHeader(GUIElementRenderer.getHeader("Europe/Berlin"));
+            }
+        }, (60 - Calendar.getInstance().get(Calendar.SECOND)) * 20, 20 * 60);
 
     }
 

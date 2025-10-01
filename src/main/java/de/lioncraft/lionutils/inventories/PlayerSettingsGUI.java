@@ -1,8 +1,10 @@
 package de.lioncraft.lionutils.inventories;
 
 import de.lioncraft.lionapi.guimanagement.Interaction.Button;
+import de.lioncraft.lionapi.guimanagement.Interaction.LionButtonFactory;
 import de.lioncraft.lionapi.guimanagement.Items;
 import de.lioncraft.lionapi.guimanagement.Interaction.Setting;
+import de.lioncraft.lionapi.guimanagement.MainMenu;
 import de.lioncraft.lionutils.listeners.SettingsListeners;
 import de.lioncraft.lionutils.utils.Settings;
 import net.kyori.adventure.text.Component;
@@ -17,6 +19,8 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public abstract class PlayerSettingsGUI {
     private static ItemStack fly, chat, invulnerable, invisible, move, hitMobs, mineBlocks, pickupItems;
@@ -33,36 +37,30 @@ public abstract class PlayerSettingsGUI {
     public static void openSelectUI(HumanEntity player){
         Inventory selectGlobalInv = Bukkit.createInventory(null, 54, Component.text("Select Player"));
         selectGlobalInv.setContents(Items.blockButtons);
-        Button back = new Button(Items.backButton.clone(), inventoryClickEvent -> {MainGUI.open(inventoryClickEvent.getWhoClicked());return false;});
-        selectGlobalInv.setItem(45, back.getButton());
-        Button global = new Button(Items.get(Component.text("Global Settings", TextColor.color(255, 255, 0)), Material.PLAYER_HEAD, TextColor.color(255, 0,255), "Opens the Settings for every Player", "Existing different Settings from", "Global will be overwritten"), inventoryClickEvent -> {
-            openSettingsUI(inventoryClickEvent.getWhoClicked(), null);
-            return false;});
-        selectGlobalInv.setItem(13, global.getButton());
+        selectGlobalInv.setItem(45, opUtils.getButton(true).getButton());
+        selectGlobalInv.setItem(13, LionButtonFactory.createButton((Items.get(Component.text("Global Settings", TextColor.color(255, 255, 0)), Material.PLAYER_HEAD, TextColor.color(255, 0,255),
+                "Opens the Settings for every Player", "Existing different Settings from", "Global will be overwritten")),
+                "lionutils_open_settings_ui"));
         selectGlobalInv.setItem(49, Items.closeButton);
         int i = 28;
         for(Settings s : Settings.getSettings()){
             if (i > 34 && i < 37) {
                 i = 37;
             }
-            Button b = new Button(Items.getPlayerHead(s.getPlayer()), inventoryClickEvent -> {
-                if(inventoryClickEvent.getClick().isMouseClick()){
-                    Settings.removeSetting(s.getPlayer());
-                }else{
-                    openSettingsUI(player, s.getPlayer());
-                }
-            return true;});
-            selectGlobalInv.setItem(i, b.getButton());
+            ItemStack is = Items.getPlayerHead(s.getPlayer());
+            is.editMeta(itemMeta -> {
+                        itemMeta.lore(List.of(Component.text("LEFTCLICK to edit"),
+                                Component.text("RIGHTCLICK to delete")));
+                    });
+            selectGlobalInv.setItem(i, LionButtonFactory.createButton(is, "lionutils_open_settings_ui."+s.getPlayer().getUniqueId()));
             i++;
             if (i >= 44) {
                 break;
             }
         }
         if(i <= 43){
-            Button add = new Button(Items.plusButton.asQuantity(5), inventoryClickEvent -> {
-                inventoryClickEvent.getWhoClicked().openInventory(addPlayerGUI());
-            return true;});
-            selectGlobalInv.setItem(i, add.getButton());
+            selectGlobalInv.setItem(i, LionButtonFactory.createButton(Items.plusButton.asQuantity(5),
+                    "lionutils_open_select_player_ui"));
         }
         player.openInventory(selectGlobalInv);
     }

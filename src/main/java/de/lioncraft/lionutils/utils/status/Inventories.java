@@ -4,6 +4,7 @@ import de.lioncraft.lionapi.guimanagement.Interaction.Button;
 import de.lioncraft.lionapi.guimanagement.Interaction.MultipleSelection;
 import de.lioncraft.lionapi.guimanagement.Interaction.Setting;
 import de.lioncraft.lionapi.guimanagement.Items;
+import de.lioncraft.lionapi.guimanagement.MainMenu;
 import de.lioncraft.lionapi.messageHandling.ColorGradient;
 import de.lioncraft.lionutils.Main;
 import net.kyori.adventure.text.Component;
@@ -103,7 +104,7 @@ public class Inventories {
         Inventory inv = Bukkit.createInventory(null, 54, Component.text("Configure Status"));
         inv.setContents(Items.blockButtons);
         inv.setItem(49, Items.closeButton);
-        Button back = new Button(Items.getBackButton("Main Menu"), inventoryClickEvent -> {
+        Button back = new Button(Items.getBackButton("Status"), inventoryClickEvent -> {
             new openStatusConfigureGUILater((Player) inventoryClickEvent.getWhoClicked(), -1, null).runTaskLater(Main.getPlugin(), 1);
         return true;});
         inv.setItem(45, back.getButton());
@@ -141,6 +142,7 @@ public class Inventories {
         Inventory inv = Bukkit.createInventory(null, 54, Component.text("Status"));
         inv.setContents(Items.blockButtons);
         inv.setItem(49, Items.closeButton);
+        inv.setItem(45, MainMenu.getToMainMenuButton());
         StatusSettings s = StatusSettings.getSettings(player);
         int i = 10;
         if(GlobalStatus.getGlobalStatusList().size() > 7){

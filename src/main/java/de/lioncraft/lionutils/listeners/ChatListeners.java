@@ -1,6 +1,9 @@
 package de.lioncraft.lionutils.listeners;
 
 import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
+import de.lioncraft.lionapi.velocity.connections.ConnectionManager;
+import de.lioncraft.lionutils.Main;
+import de.lioncraft.lionutils.messages.MessageSender;
 import de.lioncraft.lionutils.utils.MOTD;
 import de.lioncraft.lionutils.utils.MainChatMessageRenderer;
 import de.lioncraft.lionutils.utils.Settings;
@@ -12,6 +15,7 @@ import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,6 +24,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class ChatListeners implements Listener {
     @EventHandler
@@ -37,12 +42,25 @@ public class ChatListeners implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e){
         e.joinMessage(Component.text("+ >>", TextColor.color(0 ,255, 0), TextDecoration.BOLD).append(Component.text(" ", TextColor.color(255, 255, 255)).append(e.getPlayer().displayName())));
-        e.getPlayer().sendPlayerListHeaderAndFooter(getHeader().appendNewline().append(getLine()), getLine());
+        if (!ConnectionManager.isConnectedToVelocity()){
+            for(Player p : Bukkit.getServer().getOnlinePlayers()){
+                MessageSender.sendFooter(p);
+            }
+            MessageSender.sendHeader(e.getPlayer());
+        }
+
+
     }
+
     @EventHandler
     public void onLeave(PlayerQuitEvent e){
         e.quitMessage(Component.text("- <<", TextColor.color(255 ,70, 0), TextDecoration.BOLD).append(Component.text(" ", TextColor.color(255, 255, 255)).append(e.getPlayer().displayName())));
+        if (!ConnectionManager.isConnectedToVelocity())
+            for(Player p : Bukkit.getServer().getOnlinePlayers()){
+                if (p != e.getPlayer()) MessageSender.sendFooter(p);
+            }
     }
+
     @EventHandler
     public void onMOTD(PaperServerListPingEvent e){
         e.motd(MOTD.getRandomCMOTD());

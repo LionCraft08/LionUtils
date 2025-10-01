@@ -16,12 +16,6 @@ commands:
     usage: /status [args]
     description: Sets your Status.
     permission: lionutils.status
-  lionsystems:
-    aliases:
-      - ls
-    permission: OP
-    description: Main Functions for LionUtils Plugin!
-    usage: /ls
   flyspeed:
     usage: /flyspeed [get|reset|NumberRange -10 .. 10]
     permission: lionutils.flyspeed
