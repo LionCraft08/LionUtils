@@ -6,7 +6,7 @@
 
   <groupId>de.lioncraft</groupId>
   <artifactId>LionUtils</artifactId>
-  <version>1.0</version>
+  <version>1.5.1</version>
   <packaging>jar</packaging>
 
   <name>LionUtils</name>
@@ -132,6 +132,12 @@
           <artifactId>kotlin-test</artifactId>
           <version>${kotlin.version}</version>
           <scope>test</scope>
+      </dependency>
+      <dependency>
+          <groupId>de.lioncraft</groupId>
+          <artifactId>lionAPI</artifactId>
+          <version>1.10.3</version>
+          <scope>provided</scope>
       </dependency>
   </dependencies>
 </project>

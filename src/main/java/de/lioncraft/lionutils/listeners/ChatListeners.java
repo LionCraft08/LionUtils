@@ -1,12 +1,12 @@
 package de.lioncraft.lionutils.listeners;
 
 import com.destroystokyo.paper.event.server.PaperServerListPingEvent;
+import de.lioncraft.lionapi.playerSettings.PlayerSettings;
 import de.lioncraft.lionapi.velocity.connections.ConnectionManager;
 import de.lioncraft.lionutils.Main;
 import de.lioncraft.lionutils.messages.MessageSender;
 import de.lioncraft.lionutils.utils.MOTD;
 import de.lioncraft.lionutils.utils.MainChatMessageRenderer;
-import de.lioncraft.lionutils.utils.Settings;
 import io.papermc.paper.chat.ChatRenderer;
 import io.papermc.paper.command.brigadier.argument.SignedMessageResolver;
 import io.papermc.paper.event.player.AsyncChatDecorateEvent;
@@ -33,7 +33,7 @@ public class ChatListeners implements Listener {
             e.renderer(new MainChatMessageRenderer());
             e.viewers().removeIf(audience -> {
                 if(audience instanceof Player p){
-                    return !Settings.getSettings(p).isRecieveChat();
+                    return !PlayerSettings.getSettings(p).isRecieveChat();
                 }
                 return false;});
         }

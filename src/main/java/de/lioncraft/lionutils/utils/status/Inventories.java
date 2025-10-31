@@ -149,10 +149,18 @@ public class Inventories {
             i = 9;
         }
 
-        for(GlobalStatus status : GlobalStatus.getGlobalStatusList()){
-            inv.setItem(i, status.getItem(player.isOp(), s.isCurrentStatus(status)));
+        for(Map.Entry<String, GlobalStatus> status : GlobalStatus.getGlobalStatusList().entrySet()){
+            inv.setItem(i, status.getValue().getItem("global"));
             i++;
             if(i == 18) break;
+        }
+
+        if (i<18){
+            for(Map.Entry<String, GlobalStatus> status : CustomStatusManager.getCustomStatusMap().entrySet()){
+                inv.setItem(i, status.getValue().getItem("custom"));
+                i++;
+                if(i == 18) break;
+            }
         }
 
         if(player.isOp() && i < 18){
@@ -175,7 +183,7 @@ public class Inventories {
             i = 18;
         }
         for(Status status : s.getCreatedStatus()){
-            inv.setItem(i, status.getItem(player.isOp()));
+            inv.setItem(i, status.getItem("created"));
             i++;
             if((i+3)%9==0){
                 if(keepBorders){
@@ -185,7 +193,7 @@ public class Inventories {
         }
         if(amount < 18){
             Button b = new Button(Items.plusButton.asQuantity(2), inventoryClickEvent -> {
-                StatusSettings.getSettings(player).getCreatedStatus().add(new Status(null, player, false, TextColor.color(255, 255, 255), Material.NAME_TAG));
+                StatusSettings.getSettings(player).addCreatedStatus(null);
                 new openStatusConfigureGUILater(player, -1, null).runTaskLater(Main.getPlugin(), 1);
             return true;});
             if(i ==45 || i ==46){

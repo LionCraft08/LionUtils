@@ -1,11 +1,16 @@
 package de.lioncraft.lionutils.utils.status;
 
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
+import de.lioncraft.lionapi.events.invs.LionButtonClickEvent;
+import de.lioncraft.lionapi.events.team.TeamRegisterPlayerEvent;
+import de.lioncraft.lionapi.events.team.TeamRemovePlayerEvent;
 import de.lioncraft.lionutils.Main;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.PrepareAnvilEvent;
@@ -49,6 +54,66 @@ public class StatusListeners implements Listener {
             }
         }
     }
+
+    @EventHandler
+    public void onInvClick(LionButtonClickEvent e){
+        switch (e.getID()){
+            case "lionutils_statusgui_status" -> {
+                StatusSettings ss = StatusSettings.getSettings(e.getPlayer());
+                String type = "";
+                String name = e.getData();
+                if (e.getData().startsWith("created:")||e.getData().startsWith("global:")||e.getData().startsWith("custom:")) {
+                    type = e.getData().substring(0, e.getData().indexOf(":"));
+                    name = e.getData().substring(e.getData().indexOf(":")+1);
+                }
+                if(e.e().getClick().equals(ClickType.DROP)){
+                    ss.removeStatus(e.getData());
+                    if (e.getPlayer().isOp()){
+                        if (type.equals("global") && GlobalStatus.getStatus(name) != null){
+                            GlobalStatus.removeGlobalStatus(name);
+                        }
+                    }
+                }else if (e.e().isLeftClick()){
+                    ss.setCurrentStatus(e.getData());
+                } else if (e.e().isRightClick()) {
+                    if (ss.getCreatedStatusNames().contains(name)){
+                        String finalName = name;
+                        Player p = e.getPlayer();
+                        Bukkit.getScheduler().runTaskLater(Main.getPlugin(),
+                                () -> Inventories.openConfigureStatusMenu(p, ss.getCreatedStatus(finalName)), 1);
+                        return;
+                    }
+                }
+
+                Bukkit.getScheduler().runTaskLater(Main.getPlugin(),
+                        () -> Inventories.openMainMenu(e.getPlayer()), 1);
+            }
+        }
+    }
+
+    @EventHandler
+    public void onTeamJoin(TeamRegisterPlayerEvent e){
+        if (e.isCancelled()) return;
+        StatusSettings s = StatusSettings.getSettings(e.getP());
+        if (s.isAutoStatus()){
+            Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
+                s.setCurrentStatus("custom:team");
+            }, 1);
+
+        }
+    }
+
+    @EventHandler
+    public void onTeamLeave(TeamRemovePlayerEvent e){
+        if (e.isCancelled()) return;
+        StatusSettings s = StatusSettings.getSettings(e.getP());
+        if (s.isAutoStatus()){
+            if(s.isCurrentStatus("custom:team")){
+                Bukkit.getScheduler().runTaskLater(Main.getPlugin(), s::resetCurrentStatus, 1);
+            }
+        }
+    }
+
     @EventHandler
     public void onClose(InventoryCloseEvent e){
         if(e.getInventory() instanceof AnvilInventory i){

@@ -2,6 +2,7 @@ package de.lioncraft.lionutils.utils.status;
 
 import de.lioncraft.lionapi.guimanagement.Items;
 import de.lioncraft.lionapi.messageHandling.DM;
+import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
 import de.lioncraft.lionutils.Main;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
@@ -20,7 +21,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class StatusSettings implements ConfigurationSerializable {
-    private static boolean enableStatusByDefault = Main.getPlugin().getConfig().getBoolean("settings.status.enabled-by-default");
+    private static final boolean enableStatusByDefault = Main.getPlugin().getConfig().getBoolean("settings.status.enabled-by-default");
     private static final ItemStack allow = Items.get("Click to change", Material.GREEN_WOOL, "Click to change the Content");
     private static final ItemStack deny = Items.get(Component.text("INVALID NAME"), Material.RED_WOOL, "The Content can't be empty.");
 
@@ -35,19 +36,23 @@ public class StatusSettings implements ConfigurationSerializable {
     }
 
     private boolean autoStatus, enabled, isAFK;
-    private List<Status> createdStatus = new ArrayList<>();
-    private Status currentStatus;
+    private HashMap<String, Status> createdStatus = new HashMap<>();
+    private String currentStatus;
     private UUID player;
     private long afktimer;
-    private UUID selectedGlobalStatus;
 
     public StatusSettings(OfflinePlayer player) {
         setPlayer(player);
-        autoStatus =
-        enabled = true;
+        autoStatus = true;
+        enabled = isEnableStatusByDefault();
         isAFK = false;
         setCurrentStatus(new Status(getPlayerText(), player, false, TextColor.color(255, 255, 255)));
     }
+
+    public static boolean isEnableStatusByDefault() {
+        return enableStatusByDefault;
+    }
+
     private void setPlayer(OfflinePlayer p){
         player = p.getUniqueId();
     }
@@ -65,31 +70,59 @@ public class StatusSettings implements ConfigurationSerializable {
     public StatusSettings(Map<String, Object> map){
         enabled = (boolean) map.get("enabled");
         autoStatus = (boolean) map.get("auto");
-        createdStatus = (List<Status>) map.get("statuses");
         player = UUID.fromString((String) map.get("player"));
+
+        //Converting old status data to the new format.
+        Object cs = map.get("currentstatus");
+        if(cs instanceof Integer i){
+            List<Status> list = (List<Status>) map.get("statuses");
+            for(Status s : list){
+                addStatus(s);
+            }
+            setCurrentStatus("created:"+list.get(i).getName());
+        }
+        //End of conversion
+        else {
+            currentStatus = (String) cs;
+            createdStatus = (HashMap<String, Status>) map.get("statuses");
+        }
+
         settings.put(player, this);
-        currentStatus = createdStatus.get((Integer) map.get("currentstatus"));
-        if(map.get("globalstatus")!=null){
-            selectedGlobalStatus = UUID.fromString((String) map.get("globalstatus"));
+    }
+
+    private void addStatus(Status status){
+        String name = status.getName();
+        if(createdStatus.containsKey(name)){
+            if(Character.isDigit(name.charAt(name.length()-1))){
+                int i = Integer.parseInt(String.valueOf(name.charAt(name.length()-1)));
+                name = name.substring(0, name.length()-1)+i;
+            }else{
+                name = name + "_1";
+            }
+            status.setName(name);
+            addStatus(status);
+        }else{
+            createdStatus.put(name, status);
         }
     }
+
+    public void addCreatedStatus(String name){
+        Status s = new Status(null, getPlayer(), false, TextColor.color(255, 255, 255));
+        if (name != null && !name.isBlank()) s.setName(name);
+        createdStatus.put(s.getName(), s);
+    }
+
     @Override
     public @NotNull Map<String, Object> serialize() {
         Map<String, Object> map = new HashMap<>();
         map.put("enabled", enabled);
         map.put("auto", autoStatus);
         map.put("statuses", createdStatus);
-        if(selectedGlobalStatus != null){
-            map.put("globalstatus", selectedGlobalStatus.toString());
-        }
-        if(!createdStatus.contains(currentStatus)){
-            createdStatus.add(currentStatus);
-        }
-        map.put("currentstatus", createdStatus.indexOf(currentStatus));
+        map.put("currentstatus", currentStatus);
         map.put("player", player.toString());
         return map;
     }
-    public StatusSettings(Status currentStatus, OfflinePlayer player) {
+    public StatusSettings(String currentStatus, OfflinePlayer player) {
         this.currentStatus = currentStatus;
         setPlayer(player);
         autoStatus = enabled = true;
@@ -99,6 +132,11 @@ public class StatusSettings implements ConfigurationSerializable {
 
     public static HashMap<UUID, StatusSettings> getSettings() {
         return settings;
+    }
+
+    public Status getCreatedStatus(String name){
+        if (createdStatus.containsKey(name)) return createdStatus.get(name);
+        return createdStatus.get(name.replace("created:", ""));
     }
 
     public boolean isAutoStatus() {
@@ -114,11 +152,30 @@ public class StatusSettings implements ConfigurationSerializable {
     }
 
     public List<Status> getCreatedStatus() {
-        return createdStatus;
+        return createdStatus.values().stream().toList();
     }
 
     public Status getCurrentStatus() {
-        return currentStatus;
+        return switch (getStatusType()){
+            case "global" ->GlobalStatus.getStatus(getCurrentStatusName());
+            case "created" -> createdStatus.get(getCurrentStatusName());
+            case "custom" -> CustomStatusManager.getCustomStatus(getCurrentStatusName());
+            default -> null;
+        };
+    }
+
+    public String getStatusType(){
+        if(currentStatus.contains(":")){
+            return currentStatus.substring(0, currentStatus.indexOf(":"));
+        }
+        else {
+            LionChat.sendDebugMessage("Wrong value for currentStatus detected: "+currentStatus);
+            return "unknown";
+        }
+    }
+
+    public String getCurrentStatusName(){
+        return currentStatus.substring(currentStatus.indexOf(":")+1);
     }
 
     public OfflinePlayer getPlayer() {
@@ -134,23 +191,21 @@ public class StatusSettings implements ConfigurationSerializable {
         }
         afktimer = System.currentTimeMillis();
     }
-    public void removeStatus(Status s){
-        if(s instanceof GlobalStatus gs){
-            if(getSelectedGlobalStatus() == gs){
-                setCurrentStatus(getCurrentStatus());
+
+    public List<String> getCreatedStatusNames(){
+        return createdStatus.keySet().stream().toList();
+    }
+
+
+    public void removeStatus(String s){
+        if (currentStatus.equals(s)){
+            if (getStatusType().equals("created")) {
+                createdStatus.remove(getCurrentStatusName());
             }
-        }else{
-            createdStatus.remove(s);
-            if(currentStatus == s){
-                try {
-                    if(!createdStatus.isEmpty()){
-                        setCurrentStatus(createdStatus.get(0));
-                    }else{
-                        setEnabled(false);
-                    }
-                }catch (NoSuchElementException e){
-                    setEnabled(false);
-                }
+            resetCurrentStatus();
+        } else {
+            if (s.startsWith("created:")){
+                createdStatus.remove(s.replaceFirst("created:", ""));
             }
         }
     }
@@ -162,14 +217,7 @@ public class StatusSettings implements ConfigurationSerializable {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
         if(enabled){
-            GlobalStatus gs = getSelectedGlobalStatus();
-            if(gs != null){
-                gs.attachToPlayer(getPlayer().getPlayer());
-            }else if(currentStatus != null){
-                currentStatus.update();
-            }else{
-                Bukkit.getConsoleSender().sendMessage("Error 0234");
-            }
+            update();
         }else{
             if(getPlayer().getPlayer() != null){
                 getPlayer().getPlayer().displayName(Component.text(getPlayer().getPlayer().getName()));
@@ -182,7 +230,7 @@ public class StatusSettings implements ConfigurationSerializable {
         isAFK = AFK;
         if(isAFK){
             if(getPlayer().isOnline()){
-                GlobalStatus.afk.attachToPlayer(getPlayer().getPlayer());
+                GlobalStatus.afk.update(getPlayer().getPlayer());
             }
         }else{
             update();
@@ -196,62 +244,83 @@ public class StatusSettings implements ConfigurationSerializable {
     public static ItemStack getDeny() {
         return deny;
     }
+
+    public void resetCurrentStatus(){
+        try {
+            if(!createdStatus.isEmpty()){
+                setCurrentStatus(getCreatedStatusNames().get(0));
+            }else{
+                setEnabled(false);
+            }
+        }catch (NoSuchElementException e){
+            setEnabled(false);
+        }
+    }
+
     public void setCurrentStatus(Status status){
         if(status instanceof GlobalStatus g){
-            status.attachToPlayer(getPlayer().getPlayer());
-            selectedGlobalStatus = g.getId();
+            String s = g.getName();
+            setCurrentStatus("global:"+s);
+
+            //TODO Check for CustomStatus
         } else {
-            if(!createdStatus.contains(status)){
-                createdStatus.add(status);
+            if(!createdStatus.containsValue(status)){
+                createdStatus.put(status.getName(), status.attachToPlayer(getPlayer()));
             }
-            currentStatus = status;
-            status.update();
-            selectedGlobalStatus = null;
+            setCurrentStatus("created:"+status.getName());
         }
     }
 
-    public Component setCurrentStatus(String name, Player p){
-        for(Status s : getCreatedStatus()){
-            if(s.getContent().equalsIgnoreCase(name)){
-                setCurrentStatus(s);
-                return DM.messagePrefix.append(Component.text("Successfully set your Status to ").append(p.displayName()));
+    public void setCurrentStatus(String s){
+        if (s == null) setEnabled(false);
+        else
+        if (s.startsWith("global:")||s.startsWith("created:")||s.startsWith("custom:")){
+            currentStatus = s;
+        }
+        else{
+            if(createdStatus.containsKey(s)){
+                currentStatus = "created:"+s;
+            } else if (GlobalStatus.getStatus(s) != null) {
+                currentStatus = "global:"+s;
+            } else if (CustomStatusManager.getCustomStatus(s) != null) {
+                currentStatus = "custom:"+s;
             }
         }
+        update();
+    }
 
-        for(Status s : GlobalStatus.getGlobalStatusList()){
-            if(s.getContent().equalsIgnoreCase(name)){
-                setCurrentStatus(s);
-                return DM.messagePrefix.append(Component.text("Successfully set your Status to ").append(p.displayName()));
-            }
+    public boolean checkStatus(String name){
+        if (!(name.startsWith("global:")||name.startsWith("created:")||name.startsWith("custom:"))){
+            if (createdStatus.containsKey(name)){
+                name = "created:"+name;
+            } else if (GlobalStatus.getStatus(name) != null) {
+                name = "global:"+name;
+            } else if (CustomStatusManager.getCustomStatus(name) != null) {
+                name = "custom:"+name;
+            } else return false;
         }
+        String actualName = name.substring(name.indexOf(":")+1);
+        if (name.startsWith("created:")) return createdStatus.containsKey(actualName);
+        if (name.startsWith("global:")) return GlobalStatus.getStatus(actualName) != null;
+        if (name.startsWith("custom:")) return CustomStatusManager.getCustomStatus(actualName) != null;
+        return false;
+    }
 
-        return DM.messagePrefix.append(Component.text("This Status does not exist."));
-    }
-    public GlobalStatus getSelectedGlobalStatus(){
-        return GlobalStatus.getStatus(selectedGlobalStatus);
-    }
-    public boolean isCurrentStatus(Status s){
-        if(getSelectedGlobalStatus() != null){
-            return getSelectedGlobalStatus().equals(s);
-        }else{
-            return getCurrentStatus().equals(s);
-        }
-    }
     public void update(){
-        if(!getPlayer().isOnline()){
-            return;
-        }
-        if(!isEnabled()){
-            return;
-        }
-
-        if(getSelectedGlobalStatus() != null){
-            getSelectedGlobalStatus().attachToPlayer(getPlayer().getPlayer());
-        }else{
-            if(currentStatus != null){
-                currentStatus.update();
+        if (!isEnabled()) return;
+        Player p = Bukkit.getPlayer(player);
+        if (p != null){
+            switch (getStatusType()){
+                case "global" -> GlobalStatus.getStatus(getCurrentStatusName()).update(p);
+                case "created" -> createdStatus.get(getCurrentStatusName()).update();
+                case "custom" -> CustomStatusManager.getCustomStatus(getCurrentStatusName()).update(p);
             }
         }
+    }
+
+    public boolean isCurrentStatus(String s){
+        if (getCurrentStatusName().equals(s)) return true;
+        return currentStatus.equals(s);
     }
     public static void serializeAll() throws IOException {
         File f = new File(Main.getPlugin().getDataFolder(), "status.yml");
@@ -262,7 +331,7 @@ public class StatusSettings implements ConfigurationSerializable {
         YamlConfiguration yml = YamlConfiguration.loadConfiguration(f);
         List<StatusSettings> list = new ArrayList<>(settings.values());
         yml.set("player", list);
-        yml.set("global", GlobalStatus.getGlobalStatusList());
+        yml.set("global", GlobalStatus.getGlobalStatusesList());
         yml.save(f);
     }
     public static void deserializeAll(){

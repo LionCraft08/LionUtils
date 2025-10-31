@@ -1,6 +1,7 @@
 package de.lioncraft.lionutils.utils.status;
 
 import de.lioncraft.lionapi.guimanagement.Interaction.Button;
+import de.lioncraft.lionapi.guimanagement.Interaction.LionButtonFactory;
 import de.lioncraft.lionapi.guimanagement.Items;
 import de.lioncraft.lionutils.Main;
 import net.kyori.adventure.text.Component;
@@ -19,14 +20,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Status implements ConfigurationSerializable {
-    public static void setStatus(Player p, Status s){
-        s.attachToPlayer(p);
-    }
-
     private List<StatusPart> list;
-    private boolean showInPlayerListOnly, hasGradiant;
+    private String name;
+    private boolean showInPlayerListOnly;
     private TextColor nameColor;
     private UUID playerID;
     private Material material;
@@ -36,6 +35,18 @@ public class Status implements ConfigurationSerializable {
             return null;
         }
         return Bukkit.getOfflinePlayer(playerID);
+    }
+
+    public UUID getPlayerID() {
+        return playerID;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public Status(@Nullable List parts, OfflinePlayer player, boolean showInPlayerListOnly, TextColor color){
@@ -53,34 +64,35 @@ public class Status implements ConfigurationSerializable {
                 }
 
             }
-
         }
         buildStatus(list, player, showInPlayerListOnly, color);
+
     }
 
     private void buildStatus(@Nullable List<StatusPart> parts, OfflinePlayer player, boolean showInPlayerListOnly, TextColor color){
         list = new ArrayList<>();
-        if(parts != null) list = parts;
+        if(parts != null) {
+            list = parts;
+            if (!list.isEmpty())
+                name = getRawContent();
+        }
         if(player != null){
             this.playerID = player.getUniqueId();
         }
         this.showInPlayerListOnly = showInPlayerListOnly;
         this.nameColor = color;
         material = Material.NAME_TAG;
+        if (name == null) name = "mystatus_0";
     }
 
     public Status(@Nullable List<TextComponent> parts, @Nullable OfflinePlayer player, boolean showInPlayerListOnly, TextColor color, Material material){
-        list = new ArrayList<>();
+        List<StatusPart> list = new ArrayList<>();
         if(parts != null){
             for(TextComponent c : parts){
                 list.add(new StatusPart(c));
             }
         }
-        if(player != null){
-            this.playerID = player.getUniqueId();
-        }
-        this.showInPlayerListOnly = showInPlayerListOnly;
-        this.nameColor = color;
+        buildStatus(list, player, showInPlayerListOnly, color);
         this.material = material;
     }
     public void setMaterial(Material m){
@@ -101,15 +113,22 @@ public class Status implements ConfigurationSerializable {
             return true;
         } else return false;
     }
+
     public void addPart(@NotNull TextComponent part){
         list.add(new StatusPart(part));
         update();
     }
-    public Status attachToPlayer(Player p){
+
+    /**Clones the Status to be added to a new Player's created statuses
+     * @param p the Player to clone the status to
+     * @return the newly created Status
+     */
+    public Status attachToPlayer(OfflinePlayer p){
         Status s = new Status(list, p, showInPlayerListOnly, nameColor);
-        StatusSettings.getSettings(p).setCurrentStatus(s);
+        s.setName(getName());
         return s;
     }
+
     public Component getAsComponent(String playerName){
         TextComponent c = Component.text("[", TextColor.color(128, 128, 128));
         for(StatusPart component : list){
@@ -178,50 +197,62 @@ public class Status implements ConfigurationSerializable {
         return true;});
         return b.getButton();
     }
-    public ItemStack getItem(boolean isOP) {
-        ItemStack is = Items.get(getAsComponent(), getMaterial(), TextColor.color(nameColor), "- Leftclick to select", "- Rightclick to configure", "- Drop Key to delete");
-        ItemMeta meta = is.getItemMeta();
-        meta.getPersistentDataContainer().set(StatusListeners.disabledClickItems, PersistentDataType.BOOLEAN, true);
-        is.setItemMeta(meta);
+    public ItemStack getItem(String statusType) {
+        ItemStack is = LionButtonFactory.createButton(
+                Items.get(getAsComponent(), getMaterial(), TextColor.color(nameColor),
+                        "- Leftclick to select", "- Rightclick to configure", "- Drop Key to delete"),
+                "lionutils_statusgui_status."+statusType+":"+getName()
+                );
         if (StatusSettings.getSettings(getPlayer()) != null) {
-            if (StatusSettings.getSettings(getPlayer()).isCurrentStatus(this)) ;
+            if (StatusSettings.getSettings(getPlayer()).isCurrentStatus(getName())) ;
             {
                 ItemMeta im = is.getItemMeta();
                 im.setEnchantmentGlintOverride(true);
                 is.setItemMeta(im);
             }
         }
-        Button b = new Button(is, event -> {
-            if (event.getClick().equals(ClickType.DROP)){
-                StatusSettings.getSettings((Player)event.getWhoClicked()).removeStatus(this);
-                new openStatusConfigureGUILater((Player) event.getWhoClicked(), -1, this).runTaskLater(Main.getPlugin(), 1);
-            }else if(event.isLeftClick()){
-                StatusSettings.getSettings((Player) event.getWhoClicked()).setCurrentStatus(this);
-                new openStatusConfigureGUILater((Player) event.getWhoClicked(), -1, this).runTaskLater(Main.getPlugin(), 1);
-            } else if (event.isRightClick()){
-                if(event.getWhoClicked() instanceof Player p){
-                    new openStatusConfigureGUILater(p, -2, this).runTaskLater(Main.getPlugin(), 1);
-                }else return false;
-            }else return false;
-            return true;});
-        return b.getButton();
+//        Button b = new Button(is, event -> {
+//            if (event.getClick().equals(ClickType.DROP)){
+//                StatusSettings.getSettings((Player)event.getWhoClicked()).removeStatus(this);
+//                new openStatusConfigureGUILater((Player) event.getWhoClicked(), -1, this).runTaskLater(Main.getPlugin(), 1);
+//            }else if(event.isLeftClick()){
+//                StatusSettings.getSettings((Player) event.getWhoClicked()).setCurrentStatus(this);
+//                new openStatusConfigureGUILater((Player) event.getWhoClicked(), -1, this).runTaskLater(Main.getPlugin(), 1);
+//            } else if (event.isRightClick()){
+//                if(event.getWhoClicked() instanceof Player p){
+//                    if (this instanceof TeamStatus) return false;
+//                    new openStatusConfigureGUILater(p, -2, this).runTaskLater(Main.getPlugin(), 1);
+//                }else return false;
+//            }else return false;
+//            return true;});
+        return is;
     }
 
     public void update(){
-        OfflinePlayer player = getPlayer();
-        if(player != null){
-            if(player.isOnline()){
-                if(!showInPlayerListOnly){
-                    player.getPlayer().displayName(getAsComponent());
-                }else player.getPlayer().displayName(player.getPlayer().name());
-                player.getPlayer().playerListName(getAsComponent());
+        if (getPlayer() != null){
+            if (getPlayer().isOnline()){
+                update(getPlayer().getPlayer());
             }
+        }
+    }
+
+    public void update(Player player){
+        if(player != null){
+            if(!showInPlayerListOnly){
+                player.displayName(getAsComponent(player.getName()));
+            }else player.displayName(player.name());
+            player.playerListName(getAsComponent(player.getName()));
         }
     }
 
     public String getRawContent(int part){
         return list.get(part).getContent();
     }
+    public String getRawContent(){
+        if (list.isEmpty()) return "";
+        return list.stream().map(StatusPart::getContent).collect(Collectors.joining());
+    }
+
     @Override
     public @NotNull Map<String, Object> serialize() {
         Map<String, Object> m = new HashMap<>();
@@ -231,6 +262,7 @@ public class Status implements ConfigurationSerializable {
             m.put("player", getPlayer().getUniqueId().toString());
         }else m.put("player", null);
         m.put("namecolor", nameColor.asHexString());
+        m.put("name", name);
         m.put("material", getMaterial().toString());
         return m;
     }
@@ -249,6 +281,9 @@ public class Status implements ConfigurationSerializable {
         if(data.get("player") != null){
             playerID = UUID.fromString((String) data.get("player"));
         }
+        name = (String) data.get("name");
+        if (name == null) name = getContent();
+        if (name == null || name.isBlank()) name = "mystatus_0";
         nameColor = TextColor.fromHexString((String) data.get("namecolor"));
         material = Material.valueOf((String) data.get("material"));
 
@@ -259,9 +294,5 @@ public class Status implements ConfigurationSerializable {
             s.append(c.getContent());
         }
         return s.toString();
-    }
-
-    public boolean hasGradiant() {
-        return hasGradiant;
     }
 }

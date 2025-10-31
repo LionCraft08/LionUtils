@@ -1,6 +1,7 @@
 package de.lioncraft.lionutils.commands;
 
 import de.lioncraft.lionapi.messageHandling.DM;
+import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
 import de.lioncraft.lionutils.utils.status.GlobalStatus;
 import de.lioncraft.lionutils.utils.status.Inventories;
 import de.lioncraft.lionutils.utils.status.StatusSettings;
@@ -23,7 +24,13 @@ public class Status implements TabExecutor {
                 Inventories.openMainMenu(p);
             } else switch (args[0]){
                 case "set":
-                    if(args.length >= 2) p.sendMessage(StatusSettings.getSettings(p).setCurrentStatus(args[1], p));
+                    StatusSettings ss = StatusSettings.getSettings(p);
+                    if(args.length >= 2) {
+                        if (ss.checkStatus(args[1])){
+                            StatusSettings.getSettings(p).setCurrentStatus(args[1]);
+                            LionChat.sendSystemMessage(Component.text("Welcome, ").append(p.displayName()), p);
+                        }else LionChat.sendSystemMessage("Could not find that status!", p);
+                    }
                     else p.sendMessage(DM.wrongArgs);
                     break;
                 case "toggle":
@@ -64,10 +71,6 @@ public class Status implements TabExecutor {
         };
     }
     private static @NotNull List<String> getGlobalNames(){
-        List<String> list = new ArrayList<>();
-        for(de.lioncraft.lionutils.utils.status.Status s : GlobalStatus.getGlobalStatusList()){
-            list.add(s.getContent());
-        }
-        return list;
+        return new ArrayList<>(GlobalStatus.getGlobalStatusList().keySet());
     }
 }

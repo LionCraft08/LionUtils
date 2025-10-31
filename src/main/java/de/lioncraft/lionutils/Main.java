@@ -15,7 +15,6 @@ import de.lioncraft.lionutils.inventories.opUtils;
 import de.lioncraft.lionutils.listeners.*;
 import de.lioncraft.lionutils.utils.GUIElementRenderer;
 import de.lioncraft.lionutils.utils.ResetUtils;
-import de.lioncraft.lionutils.utils.Settings;
 import de.lioncraft.lionutils.utils.status.*;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -51,7 +50,7 @@ public final class Main extends JavaPlugin {
             }
         }
 
-        ConfigurationSerialization.registerClass(Settings.class);
+
         ConfigurationSerialization.registerClass(de.lioncraft.lionutils.utils.status.Status.class);
         ConfigurationSerialization.registerClass(StatusSettings.class);
         ConfigurationSerialization.registerClass(GlobalStatus.class);
@@ -60,9 +59,10 @@ public final class Main extends JavaPlugin {
         ConfigurationSerialization.registerClass(ChallengesData.class);
 
         getServer().getPluginManager().registerEvents(new StatusListeners(), this);
+        getServer().getPluginManager().registerEvents(new DataListeners(), this);
         getServer().getPluginManager().registerEvents(new ChatListeners(), this);
         getServer().getPluginManager().registerEvents(new InvListeners(), this);
-        getServer().getPluginManager().registerEvents(new SettingsListeners(), this);
+        getServer().getPluginManager().registerEvents(new SettingsInvListeners(), this);
         getServer().getPluginManager().registerEvents(new AnvilFixes(), this);
         getServer().getPluginManager().registerEvents(new DamageDisplayListeners(), this);
         getServer().getPluginManager().registerEvents(new StartupListener(), this);
@@ -102,18 +102,13 @@ public final class Main extends JavaPlugin {
     public void onDisable() {
         DamageDisplay.save();
         try {
-            Settings.serializeAll();
+            de.lioncraft.lionutils.utils.status.StatusSettings.serializeAll();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }finally {
-            try {
-                de.lioncraft.lionutils.utils.status.StatusSettings.serializeAll();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }finally {
-                ChallengesData.save();
-            }
+            ChallengesData.save();
         }
+
     }
 
     private static List<ResetFunction> list = new ArrayList<>();

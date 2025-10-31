@@ -2,11 +2,11 @@ package de.lioncraft.lionutils.listeners;
 
 import de.lioncraft.lionapi.events.invs.LionButtonClickEvent;
 import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
+import de.lioncraft.lionapi.playerSettings.PlayerSettings;
 import de.lioncraft.lionutils.inventories.ChallengesGUI;
 import de.lioncraft.lionutils.inventories.DamageDisplay;
 import de.lioncraft.lionutils.inventories.PlayerSettingsGUI;
 import de.lioncraft.lionutils.inventories.opUtils;
-import de.lioncraft.lionutils.utils.Settings;
 import de.lioncraft.lionutils.utils.status.Inventories;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -68,7 +68,7 @@ public class LionButtonListeners implements Listener {
                     if(e.e().getClick().isLeftClick()){
                         PlayerSettingsGUI.openSettingsUI(e.getPlayer(), p);
                     }else if (e.e().isRightClick()){
-                        Settings.removeSetting(p);
+                        PlayerSettings.removeSetting(p);
                         PlayerSettingsGUI.openSelectUI(e.getPlayer());
                     }
                 }

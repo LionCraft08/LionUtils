@@ -4,7 +4,6 @@ import de.lioncraft.lionutils.Main;
 import de.lioncraft.lionutils.inventories.DamageDisplay;
 import de.lioncraft.lionutils.inventories.PlayerSettingsGUI;
 import de.lioncraft.lionutils.utils.InvWatcher;
-import de.lioncraft.lionutils.utils.Settings;
 import de.lioncraft.lionutils.utils.status.StatusChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -20,7 +19,6 @@ public class StartupListener implements Listener {
         PlayerSettingsGUI.Initialize();
         StatusChecker.thisTask = new StatusChecker().runTaskTimer(Main.getPlugin(), StatusChecker.afkTime, 200);
 
-        Settings.deserializeAll();
         de.lioncraft.lionutils.utils.status.StatusSettings.deserializeAll();
         DamageDisplay.deserialize();
         DamageDisplay.Init();

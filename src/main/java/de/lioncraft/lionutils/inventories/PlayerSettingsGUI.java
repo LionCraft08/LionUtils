@@ -4,9 +4,8 @@ import de.lioncraft.lionapi.guimanagement.Interaction.Button;
 import de.lioncraft.lionapi.guimanagement.Interaction.LionButtonFactory;
 import de.lioncraft.lionapi.guimanagement.Items;
 import de.lioncraft.lionapi.guimanagement.Interaction.Setting;
-import de.lioncraft.lionapi.guimanagement.MainMenu;
-import de.lioncraft.lionutils.listeners.SettingsListeners;
-import de.lioncraft.lionutils.utils.Settings;
+import de.lioncraft.lionapi.playerSettings.PlayerSettings;
+import de.lioncraft.lionutils.listeners.SettingsInvListeners;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -43,7 +42,7 @@ public abstract class PlayerSettingsGUI {
                 "lionutils_open_settings_ui"));
         selectGlobalInv.setItem(49, Items.closeButton);
         int i = 28;
-        for(Settings s : Settings.getSettings()){
+        for(PlayerSettings s : PlayerSettings.getPlayerSettings()){
             if (i > 34 && i < 37) {
                 i = 37;
             }
@@ -65,7 +64,7 @@ public abstract class PlayerSettingsGUI {
         player.openInventory(selectGlobalInv);
     }
     public static void openSettingsUI(@NotNull HumanEntity viewer, @Nullable OfflinePlayer player){
-        Settings s = Settings.getSettings(player);
+        PlayerSettings s = PlayerSettings.getSettings(player);
         Inventory settingsInv = Bukkit.createInventory(null, 54, Component.text("Player Settings"));
         settingsInv.setContents(Items.blockButtons);
         Button back2 = new Button(Items.backButton.clone(), inventoryClickEvent -> {
@@ -109,10 +108,10 @@ public abstract class PlayerSettingsGUI {
     public static Inventory addPlayerGUI(){
         Inventory inv = Bukkit.createInventory(null, 54, Component.text("Attach custom Settings to"));
         inv.setContents(Items.blockButtons);
-        Settings s = Settings.getSettings(null);
+        PlayerSettings s = PlayerSettings.getSettings(null);
         int i = 10;
         for(Player p : Bukkit.getOnlinePlayers()){
-            if(Settings.getSettings(p)==s){
+            if(PlayerSettings.getSettings(p)==s){
                 inv.setItem(i, Items.getPlayerHead(p));
                 i++;
                 if(i == 17 || i == 26 || i == 35){
@@ -126,7 +125,7 @@ public abstract class PlayerSettingsGUI {
                 }
             }
         }
-        SettingsListeners.addPlayerAddToSettingsInv(inv);
+        SettingsInvListeners.addPlayerAddToSettingsInv(inv);
         return inv;
     }
 }
