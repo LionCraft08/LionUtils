@@ -15,6 +15,7 @@ Info: To work properly, the World reset needs a startup script to be set (spigot
 <summary>status</summary>
 Allows you to edit the Status in the Tab List. <br>
 It is highly recommended to use the UI for Status management as it provides way more features than the command. (accessible through lionAPI Main Menu or /status) 
+You can set your own status, select a Global Status or use a dynamiv Status like your Teamname
 
 </details>
 <details>
