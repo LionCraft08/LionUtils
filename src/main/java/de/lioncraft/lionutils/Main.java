@@ -1,6 +1,8 @@
 package de.lioncraft.lionutils;
 
 import de.lioncraft.lionapi.addons.AddonManager;
+import de.lioncraft.lionapi.data.ConfigManager;
+import de.lioncraft.lionapi.events.saveDataEvent;
 import de.lioncraft.lionapi.guimanagement.Interaction.Button;
 import de.lioncraft.lionapi.guimanagement.Interaction.LionButtonFactory;
 import de.lioncraft.lionapi.guimanagement.Items;
@@ -15,6 +17,7 @@ import de.lioncraft.lionutils.inventories.opUtils;
 import de.lioncraft.lionutils.listeners.*;
 import de.lioncraft.lionutils.utils.GUIElementRenderer;
 import de.lioncraft.lionutils.utils.ResetUtils;
+import de.lioncraft.lionutils.utils.spectator.SpectatorManager;
 import de.lioncraft.lionutils.utils.status.*;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -41,6 +44,8 @@ public final class Main extends JavaPlugin {
 
         this.saveDefaultConfig();
         reloadConfig();
+        new ConfigManager(this).loadAndCheckConfig();
+
 
         if(getConfig().getBoolean("delete-worlds-on-startup")){
             getLogger().info("Starting to delete Worlds");
@@ -78,6 +83,8 @@ public final class Main extends JavaPlugin {
 
         AddonManager.registerAddon(CommandUtilsAddon.getInstance());
 
+        SpectatorManager.init();
+
 
         MainMenu.setButton(14, LionButtonFactory.createButton(Items.get("Status", Material.NAME_TAG, "Click to configure your status."),
                 "lionutils_open_status_menu"));
@@ -100,15 +107,7 @@ public final class Main extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        DamageDisplay.save();
-        try {
-            de.lioncraft.lionutils.utils.status.StatusSettings.serializeAll();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }finally {
-            ChallengesData.save();
-        }
-
+        new DataListeners().onSave(new saveDataEvent());
     }
 
     private static List<ResetFunction> list = new ArrayList<>();

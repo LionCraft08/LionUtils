@@ -11,6 +11,10 @@ public class CustomStatusManager {
         return customStatusMap.get(name);
     }
 
+    public static void addCustomStatus(String s, GlobalStatus customStatus) {
+        CustomStatusManager.customStatusMap.put(s, customStatus);
+    }
+
     public static HashMap<String, GlobalStatus> getCustomStatusMap() {
         return customStatusMap;
     }

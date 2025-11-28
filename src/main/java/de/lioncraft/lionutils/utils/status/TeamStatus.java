@@ -22,7 +22,7 @@ public class TeamStatus extends GlobalStatus {
             if (p != null){
                 Team t = Team.getTeam(p);
                 if(t != null){
-                    c = c.append(Component.text(t.getName(), TextColor.color(0, 190, 200)));
+                    c = c.append(t.getComponentName());
                 }
             }
         }else c = c.append(Component.text("TEAMNAME", TextColor.color(0, 190, 200)));

@@ -6,7 +6,7 @@
 
   <groupId>de.lioncraft</groupId>
   <artifactId>LionUtils</artifactId>
-  <version>1.5.1</version>
+  <version>1.5.2</version>
   <packaging>jar</packaging>
 
   <name>LionUtils</name>
@@ -136,7 +136,7 @@
       <dependency>
           <groupId>de.lioncraft</groupId>
           <artifactId>lionAPI</artifactId>
-          <version>1.10.3</version>
+          <version>1.10.5</version>
           <scope>provided</scope>
       </dependency>
   </dependencies>
