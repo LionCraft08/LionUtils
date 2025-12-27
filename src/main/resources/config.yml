@@ -6,7 +6,7 @@
 
 # IMPORTANT: Do not change this version number. It is used by the plugin
 # to automatically update the configuration with new settings.
-config-version: 1.1
+config-version: 1.2
 
 
 
@@ -18,6 +18,9 @@ advanced-spectator:
 
   #Mainly used by the reset Command, may get changed during runtime, however, value can be manually changed.
 delete-worlds-on-startup: false
+
+#Whether to allow using the /reset command. set this to false if you have a world you don't want to be deleted.
+allow-reset: true
 
 modts:
   withonlineplayers:

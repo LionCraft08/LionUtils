@@ -1,7 +1,9 @@
 package de.lioncraft.lionutils.commands;
 
 import de.lioncraft.lionapi.messageHandling.DM;
+import de.lioncraft.lionapi.messageHandling.MSG;
 import de.lioncraft.lionapi.messageHandling.defaultMessages;
+import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
 import de.lioncraft.lionutils.utils.InvWatcher;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -15,6 +17,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static de.lioncraft.lionutils.Main.lm;
+
 public class Inv implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -26,15 +30,14 @@ public class Inv implements TabExecutor {
                         if(args.length >= 2){
                             if (args[1].equalsIgnoreCase("confirm")) {
                                 InvWatcher.open(p, target);
-                            }else sender.sendMessage(DM.wrongArgs);
+                            }else LionChat.sendSystemMessage(MSG.WRONG_ARGS, p);
                         }else{
-                            sender.sendMessage(DM.error(Component.text("Opening your own Inventory can cause Item Duplication and other glitches." +
-                                    "Click here to open it anyways.").clickEvent(ClickEvent.runCommand("/inv " + p.getName() + " confirm"))));
+                            sender.sendMessage(lm().msg("command.inv.self").clickEvent(ClickEvent.runCommand("/inv " + p.getName() + " confirm")));
                         }
                     }else InvWatcher.open(p, target);
-                }else sender.sendMessage(DM.noPlayer);
-            }else sender.sendMessage(DM.wrongArgs);
-        }else sender.sendMessage(DM.notAPlayer);
+                }else LionChat.sendSystemMessage(MSG.NO_PLAYER, p);
+            }else LionChat.sendSystemMessage(MSG.WRONG_ARGS, p);
+        }else LionChat.sendSystemMessage(MSG.NOT_A_PLAYER, sender);
         return true;
     }
 

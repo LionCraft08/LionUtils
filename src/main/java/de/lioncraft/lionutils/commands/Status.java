@@ -1,6 +1,7 @@
 package de.lioncraft.lionutils.commands;
 
 import de.lioncraft.lionapi.messageHandling.DM;
+import de.lioncraft.lionapi.messageHandling.MSG;
 import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
 import de.lioncraft.lionutils.utils.status.GlobalStatus;
 import de.lioncraft.lionutils.utils.status.Inventories;
@@ -16,6 +17,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static de.lioncraft.lionutils.Main.lm;
+
 public class Status implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -28,10 +31,10 @@ public class Status implements TabExecutor {
                     if(args.length >= 2) {
                         if (ss.checkStatus(args[1])){
                             StatusSettings.getSettings(p).setCurrentStatus(args[1]);
-                            LionChat.sendSystemMessage(Component.text("Welcome, ").append(p.displayName()), p);
-                        }else LionChat.sendSystemMessage("Could not find that status!", p);
+                            LionChat.sendMessageOnChannel("status", lm().msg("command.status.set_new", p.displayName()), p);
+                        }else LionChat.sendMessageOnChannel("status", lm().msg("command.status.not_found"), p);
                     }
-                    else p.sendMessage(DM.wrongArgs);
+                    else LionChat.sendMessageOnChannel("status", MSG.WRONG_ARGS, p);
                     break;
                 case "toggle":
                     StatusSettings s = StatusSettings.getSettings(p);
@@ -45,16 +48,16 @@ public class Status implements TabExecutor {
                     }
                     s.setEnabled(b);
                     if(s.isEnabled()){
-                        p.sendMessage(DM.messagePrefix.append(Component.text("Enabled your Status")));
-                    }else p.sendMessage(DM.messagePrefix.append(Component.text("Disabled your Status")));
+                        LionChat.sendMessageOnChannel("status", lm().msg("command.status.enabled"), p);
+                    }else LionChat.sendMessageOnChannel("status", lm().msg("command.status.disabled"), p);
                     break;
                 case "openui":
                     Inventories.openMainMenu(p);
                     break;
                 default:
-                    p.sendMessage(DM.wrongArgs);
+                    LionChat.sendMessageOnChannel("status", MSG.WRONG_ARGS, p);
             }
-        }else sender.sendMessage(DM.notAPlayer);
+        }else LionChat.sendMessageOnChannel("status", MSG.NOT_A_PLAYER, sender);
         return true;
     }
 

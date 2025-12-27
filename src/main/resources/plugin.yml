@@ -33,6 +33,10 @@ commands:
     permission: OP
     usage: /reset
     description: Reset the Server! Use carefully!
+  structure:
+    permission: OP
+    usage: /structure [args]
+    description: Place a Structure as World Spawn / Meeting Point
 permissions:
   lionutils.inv.view:
     default: op

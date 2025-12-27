@@ -1,7 +1,9 @@
 package de.lioncraft.lionutils.commands;
 
 import de.lioncraft.lionapi.messageHandling.DM;
+import de.lioncraft.lionapi.messageHandling.MSG;
 import de.lioncraft.lionapi.messageHandling.defaultMessages;
+import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -14,6 +16,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static de.lioncraft.lionutils.Main.lm;
+
 public class Ping implements TabExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -25,12 +29,12 @@ public class Ping implements TabExecutor {
             if (Bukkit.getPlayer(args[0]) != null) {
                 p = Bukkit.getPlayer(args[0]);
             } else {
-                sender.sendMessage(DM.noPlayer);
+                LionChat.sendSystemMessage(MSG.NO_PLAYER, sender);
                 return true;
             }
         }
         if(p == null){
-            sender.sendMessage(DM.notAPlayer);
+            LionChat.sendSystemMessage(MSG.NOT_A_PLAYER, sender);
             return true;
         }
         Component c;
@@ -42,10 +46,11 @@ public class Ping implements TabExecutor {
         } else if (i <= 500) {
             c = Component.text(i + "ms", TextColor.color(255, 128, 0));
         }else c = Component.text(i + "ms", TextColor.color(255, 0, 0));
+
         if(p == sender){
-            sender.sendMessage(DM.messagePrefix.append(Component.text("Your current Ping is ").append(c)));
+            LionChat.sendSystemMessage(lm().msg("command.ping.self", c), sender);
         }else{
-            sender.sendMessage(DM.messagePrefix.append(Component.text(p.getName() + "'s current ping is ").append(c)));
+            LionChat.sendSystemMessage(lm().msg("command.ping.other", p.name(), c), sender);
         }
         return true;
     }

@@ -1,5 +1,5 @@
 name: LionUtils
-version: '1.5.1'
+version: '1.5.2'
 main: de.lioncraft.lionutils.Main
 api-version: '1.20'
 load: STARTUP
@@ -33,6 +33,10 @@ commands:
     permission: OP
     usage: /reset
     description: Reset the Server! Use carefully!
+  structure:
+    permission: OP
+    usage: /structure [args]
+    description: Place a Structure as World Spawn / Meeting Point
 permissions:
   lionutils.inv.view:
     default: op

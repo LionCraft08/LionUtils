@@ -1,5 +1,6 @@
 package de.lioncraft.lionutils;
 
+import de.lioncraft.lionapi.LionAPI;
 import de.lioncraft.lionapi.addons.AddonManager;
 import de.lioncraft.lionapi.data.ConfigManager;
 import de.lioncraft.lionapi.events.saveDataEvent;
@@ -7,6 +8,9 @@ import de.lioncraft.lionapi.guimanagement.Interaction.Button;
 import de.lioncraft.lionapi.guimanagement.Interaction.LionButtonFactory;
 import de.lioncraft.lionapi.guimanagement.Items;
 import de.lioncraft.lionapi.guimanagement.MainMenu;
+import de.lioncraft.lionapi.messageHandling.lang.LanguageFileManager;
+import de.lioncraft.lionapi.messageHandling.lionchat.ChannelConfiguration;
+import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
 import de.lioncraft.lionapi.velocity.connections.ConnectionManager;
 import de.lioncraft.lionutils.addons.CommandUtilsAddon;
 import de.lioncraft.lionutils.data.ChallengesData;
@@ -17,9 +21,11 @@ import de.lioncraft.lionutils.inventories.opUtils;
 import de.lioncraft.lionutils.listeners.*;
 import de.lioncraft.lionutils.utils.GUIElementRenderer;
 import de.lioncraft.lionutils.utils.ResetUtils;
+import de.lioncraft.lionutils.utils.StructureUtils;
 import de.lioncraft.lionutils.utils.spectator.SpectatorManager;
 import de.lioncraft.lionutils.utils.status.*;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
@@ -46,13 +52,21 @@ public final class Main extends JavaPlugin {
         reloadConfig();
         new ConfigManager(this).loadAndCheckConfig();
 
+        LanguageFileManager.saveLangFiles(this);
+        lm = LanguageFileManager.createManager(this, LionAPI.getLanguage());
+
+        saveResource("structure.nbt", false);
 
         if(getConfig().getBoolean("delete-worlds-on-startup")){
-            getLogger().info("Starting to delete Worlds");
-            ResetUtils.deleteWorlds(this);
-            for (ResetFunction f : list){
-                f.execute();
+            if (!getConfig().getBoolean("allow-reset")) getLogger().warning("You tried to reset the worlds but resetting is disabled. Set allow-reset to true in the plugin's config.yml to allow this.");
+            else {
+                getLogger().info("Starting to delete Worlds");
+                ResetUtils.deleteWorlds(this);
+                for (ResetFunction f : list) {
+                    f.execute();
+                }
             }
+            Main.getPlugin().getConfig().set("delete-worlds-on-startup", false);
         }
 
 
@@ -80,6 +94,7 @@ public final class Main extends JavaPlugin {
         getCommand("flyspeed").setExecutor(new Flyspeed());
         getCommand("statistics").setExecutor(new StatsCommand());
         getCommand("reset").setExecutor(new ResetCommand());
+        getCommand("structure").setExecutor(new StructureCommand());
 
         AddonManager.registerAddon(CommandUtilsAddon.getInstance());
 
@@ -90,6 +105,14 @@ public final class Main extends JavaPlugin {
                 "lionutils_open_status_menu"));
         MainMenu.setButton(53, LionButtonFactory.createButton(Items.get(Component.text("OPUtils"), Material.COMPARATOR, "Some useful stuff for Operators"),
                 "lionutils_open_op_utils"));
+
+        StructureUtils.loadStructure();
+
+        LionChat.registerChannel("status", new ChannelConfiguration(
+                false,
+                NamedTextColor.WHITE,
+                Component.text("Status", NamedTextColor.GOLD),
+                false));
 
 
         Bukkit.getScheduler().runTaskTimer(this, () -> {
@@ -103,11 +126,20 @@ public final class Main extends JavaPlugin {
 
 
     private static Plugin plugin;
+    private static LanguageFileManager lm;
 
 
     @Override
     public void onDisable() {
         new DataListeners().onSave(new saveDataEvent());
+    }
+
+    public static LanguageFileManager lm() {
+        return getLanguageManager();
+    }
+
+    public static LanguageFileManager getLanguageManager() {
+        return lm;
     }
 
     private static List<ResetFunction> list = new ArrayList<>();

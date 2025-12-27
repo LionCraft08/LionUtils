@@ -7,6 +7,7 @@ import de.lioncraft.lionutils.inventories.ChallengesGUI;
 import de.lioncraft.lionutils.inventories.DamageDisplay;
 import de.lioncraft.lionutils.inventories.PlayerSettingsGUI;
 import de.lioncraft.lionutils.inventories.opUtils;
+import de.lioncraft.lionutils.utils.StructureUtils;
 import de.lioncraft.lionutils.utils.status.Inventories;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -76,6 +77,7 @@ public class LionButtonListeners implements Listener {
             case "lionutils_open_select_player_ui" ->{
                 e.getPlayer().openInventory(PlayerSettingsGUI.addPlayerGUI());
             }
+            case "lionutils_spawn_house" -> StructureUtils.doEverything(e.getPlayer());
         }
     }
     public static void heal(Player p){

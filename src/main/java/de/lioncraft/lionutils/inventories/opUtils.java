@@ -52,6 +52,12 @@ public final class opUtils {
         inv.setItem(16, LionButtonFactory.createButton(Items.get(Component.text("Player Management", TextColor.color(0, 255, 255)),
                 Material.PLAYER_HEAD, "Opens a GUI to manage Player Abilities"),
                 "lionutils_player_management"));
+
+        inv.setItem(28, LionButtonFactory.createButton(Items.get(Component.text("Create starter house", TextColor.color(0, 255, 255)),
+                Material.OAK_LOG, "Creates a Structure, teleports players into it",
+                        "sets the world spawn and protects it from",
+                        "being destroyed by players"),
+                "lionutils_spawn_house"));
     }
 
     public static Button getButton(boolean disappear){

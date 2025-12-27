@@ -47,7 +47,7 @@ public class ResetUtils {
     public static void resetAll(){
         for(Player p : Bukkit.getOnlinePlayers()){
             if (ConnectionManager.isConnectedToVelocity()) sendServerSendRequest(p, "lobby");
-            else p.kick(Component.text("Resetting the Server...", TextColor.color(0, 255, 255)));
+            else p.kick(Main.lm().msg("command.reset.kick_message"));
         }
 
 
@@ -73,7 +73,7 @@ public class ResetUtils {
         Main.getPlugin().saveConfig();
 
         Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () -> {
-            Bukkit.getServer().spigot().restart();
+            Bukkit.getServer().restart();
         }, 24);
 
     }

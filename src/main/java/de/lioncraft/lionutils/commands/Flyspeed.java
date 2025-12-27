@@ -1,6 +1,8 @@
 package de.lioncraft.lionutils.commands;
 
 import de.lioncraft.lionapi.messageHandling.DM;
+import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
+import de.lioncraft.lionutils.Main;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.GameMode;
@@ -22,30 +24,36 @@ public class Flyspeed implements TabExecutor {
                 if(args.length >= 1){
                     switch (args[0]){
                         case "get":
-                            p.sendMessage(DM.messagePrefix.append(Component.text("Deine Fluggeschwindigkeit beträgt " + p.getFlySpeed()*10 + " Bratwürste").hoverEvent(Component.text("Idk welche Einheit das ist...").asHoverEvent())));
+                            LionChat.sendSystemMessage(Main.lm().msg("command.flyspeed.info", String.valueOf(p.getFlySpeed()*10)), p);
+                            //p.sendMessage(DM.messagePrefix.append(Component.text("Deine Fluggeschwindigkeit beträgt " + p.getFlySpeed()*10 + " Bratwürste").hoverEvent(Component.text("Idk welche Einheit das ist...").asHoverEvent())));
                             break;
                         case "reset":
                             p.setFlySpeed(0.1f);
-                            p.sendMessage(DM.messagePrefix.append(Component.text("Deine Fluggeschwindigkeit beträgt nun " + p.getFlySpeed()*10 + " Bratwürste").hoverEvent(Component.text("Idk welche Einheit das ist...").asHoverEvent())));
+                            LionChat.sendSystemMessage(Main.lm().msg("command.flyspeed.update", String.valueOf(p.getFlySpeed()*10)), p);
+                            //p.sendMessage(DM.messagePrefix.append(Component.text("Deine Fluggeschwindigkeit beträgt nun " + p.getFlySpeed()*10 + " Bratwürste").hoverEvent(Component.text("Idk welche Einheit das ist...").asHoverEvent())));
                             break;
                         default:
                             try {
                                 float f = Float.parseFloat(args[0]);
                                 if(f > 10 || f < -10){
-                                    p.sendMessage(DM.messagePrefix.append(Component.text(f + " ist außerhalb der Range von -10 bis 10.")));
+                                    LionChat.sendSystemMessage(Main.lm().msg("command.flyspeed.wrong_number", String.valueOf(f)), p);
+                                    //p.sendMessage(DM.messagePrefix.append(Component.text(f + " ist außerhalb der Range von -10 bis 10.")));
                                 }else {
                                     p.setFlySpeed(f / 10f);
-                                    p.sendMessage(DM.messagePrefix.append(Component.text("Deine Fluggeschwindigkeit beträgt nun " + p.getFlySpeed() * 10 + " Bratwürste").hoverEvent(Component.text("Idk welche Einheit das ist...").asHoverEvent())));
+                                    LionChat.sendSystemMessage(Main.lm().msg("command.flyspeed.update", String.valueOf(p.getFlySpeed() * 10)), p);
+                                    //p.sendMessage(DM.messagePrefix.append(Component.text("Deine Fluggeschwindigkeit beträgt nun " + p.getFlySpeed() * 10 + " Bratwürste").hoverEvent(Component.text("Idk welche Einheit das ist...").asHoverEvent())));
                                 }
                             }catch (NumberFormatException e){
-                                p.sendMessage(DM.messagePrefix.append(Component.text("["+e.getClass().getName()+"] \"" + args[0] + "\" ist keine Zahl")));
+                                LionChat.sendSystemMessage(Main.lm().msg("command.flyspeed.not_a_number", args[0]), p);
+                                //p.sendMessage(DM.messagePrefix.append(Component.text("["+e.getClass().getName()+"] \"" + args[0] + "\" ist keine Zahl")));
                             }
                     }
                 }else{
-                    p.sendMessage(DM.messagePrefix.append(Component.text("Deine Fluggeschwindigkeit beträgt " + p.getFlySpeed()*10 + " Bratwürste").hoverEvent(Component.text("Idk welche Einheit das ist...").asHoverEvent())));
+                    LionChat.sendSystemMessage(Main.lm().msg("command.flyspeed.info", String.valueOf(p.getFlySpeed()*10)), p);
+                    //p.sendMessage(DM.messagePrefix.append(Component.text("Deine Fluggeschwindigkeit beträgt " + p.getFlySpeed()*10 + " Bratwürste").hoverEvent(Component.text("Idk welche Einheit das ist...").asHoverEvent())));
                 }
-            }else p.sendMessage(DM.messagePrefix.append(Component.text("Du kannst nicht fliegen!", TextColor.color(255, 128, 0))));
-        }
+            }else LionChat.sendSystemMessage(Main.lm().msg("command.flyspeed.not_possible"), p);
+        } else LionChat.sendSystemMessage(Main.lm().msg("command.flyspeed.not_possible"), sender);
         return true;
     }
 
@@ -55,5 +63,6 @@ public class Flyspeed implements TabExecutor {
             case 1->List.of("get", "reset", "2", "5", "10");
             default -> List.of();
         };
+
     }
 }
