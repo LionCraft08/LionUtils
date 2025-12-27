@@ -46,3 +46,13 @@ If you set it to a negative value, this will inverty your direction (Idk what th
 Allows you to set custom MOTDs for when the server is empty and when the server has players on it, including the option to add a random player's name to the text. 
 
 </details>
+
+</details>
+<details>
+<summary>Structure</summary>
+Use the /structure command to
+- Place a structure in the world that is automatically protected against griefing
+- Open and close the doors of the structure
+- teleport players into the structure
+- set the strucutre's center as world spawn
+</details>
