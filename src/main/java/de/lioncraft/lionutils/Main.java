@@ -76,6 +76,7 @@ public final class Main extends JavaPlugin {
         ConfigurationSerialization.registerClass(DamageDisplay.class);
         ConfigurationSerialization.registerClass(StatusPart.class);
         ConfigurationSerialization.registerClass(ChallengesData.class);
+        ConfigurationSerialization.registerClass(StructureProtectionListeners.class);
 
         getServer().getPluginManager().registerEvents(new StatusListeners(), this);
         getServer().getPluginManager().registerEvents(new DataListeners(), this);
@@ -99,6 +100,7 @@ public final class Main extends JavaPlugin {
         AddonManager.registerAddon(CommandUtilsAddon.getInstance());
 
         SpectatorManager.init();
+        StructureUtils.load();
 
 
         MainMenu.setButton(14, LionButtonFactory.createButton(Items.get("Status", Material.NAME_TAG, "Click to configure your status."),

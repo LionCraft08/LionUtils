@@ -2,8 +2,11 @@ package de.lioncraft.lionutils.listeners;
 
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
+import de.lioncraft.lionutils.Main;
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -17,15 +20,26 @@ import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class StructureProtectionListeners implements Listener {
+public class StructureProtectionListeners implements Listener, ConfigurationSerializable {
     private static List<StructureProtectionListeners> activeListeners = new ArrayList<>();
 
     public static List<StructureProtectionListeners> getActiveListeners() {
         return activeListeners;
+    }
+
+    public static void setStructureProtectionListeners(List<StructureProtectionListeners> spls) {
+        activeListeners = spls;
+        if (activeListeners == null) activeListeners = new ArrayList<>();
+        for (StructureProtectionListeners spl : activeListeners) {
+            Bukkit.getPluginManager().registerEvents(spl, Main.getPlugin());
+        }
     }
 
     private final Vector pos1;
@@ -170,5 +184,19 @@ public class StructureProtectionListeners implements Listener {
                 return;
             }
         }
+    }
+
+    public StructureProtectionListeners(Map<String, Object> map) {
+        this.pos1 = ((Location) map.get("pos1")).toVector();
+        this.pos2 = ((Location) map.get("pos2")).toVector();
+        this.worldName = ((Location) map.get("pos1")).getWorld().getName();
+    }
+
+    @Override
+    public @NotNull Map<String, Object> serialize() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("pos1", pos1.toLocation(Bukkit.getWorld(worldName)));
+        map.put("pos2", pos2.toLocation(Bukkit.getWorld(worldName)));
+        return map;
     }
 }

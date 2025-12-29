@@ -3,21 +3,18 @@ package de.lioncraft.lionutils.utils;
 import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
 import de.lioncraft.lionutils.Main;
 import de.lioncraft.lionutils.listeners.StructureProtectionListeners;
-import io.papermc.paper.command.brigadier.argument.resolvers.BlockPositionResolver;
-import io.papermc.paper.math.Position;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.structure.Mirror;
 import org.bukkit.block.structure.StructureRotation;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.structure.Structure;
-import org.bukkit.structure.StructureManager;
-import org.bukkit.util.BlockTransformer;
-import org.bukkit.util.EntityTransformer;
 import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Random;
 
 public class StructureUtils
@@ -33,8 +30,40 @@ public class StructureUtils
             LionChat.sendLogMessage("Couldn't load structure!");
             throw new RuntimeException(e);
         }
+
     }
 
+    private static File dataFile = Main.getPlugin().getDataPath().resolve("structure_config.yml").toFile();
+
+    public static void save(){
+        if(!dataFile.exists()){
+            try {
+                dataFile.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(dataFile);
+        config.set("structures", StructureProtectionListeners.getActiveListeners());
+        config.set("spawnLocation", StructureProtectionListeners.respawnLocation);
+        try {
+            config.save(dataFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static void load(){
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(dataFile);
+        if(config.contains("spawnLocation")){
+            StructureProtectionListeners.respawnLocation = config.getLocation("spawnLocation");
+        }
+        if(config.contains("structures")) {
+            Object o = config.get("structures");
+            if(o != null){
+                StructureProtectionListeners.setStructureProtectionListeners((List<StructureProtectionListeners>) o);
+            }
+        }
+    }
     public static void createStructure(Location center, StructureRotation rotation){
         Location corner = getCenteredOrigin(center, rotation, structure);
         World world = corner.getWorld();

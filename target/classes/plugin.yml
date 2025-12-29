@@ -1,5 +1,5 @@
 name: LionUtils
-version: '1.5.2'
+version: '1.6.1'
 main: de.lioncraft.lionutils.Main
 api-version: '1.20'
 load: STARTUP

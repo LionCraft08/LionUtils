@@ -2,6 +2,7 @@ package de.lioncraft.lionutils.listeners;
 
 import de.lioncraft.lionapi.events.saveDataEvent;
 import de.lioncraft.lionutils.data.ChallengesData;
+import de.lioncraft.lionutils.utils.StructureUtils;
 import de.lioncraft.lionutils.utils.spectator.SpectatorManager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,6 +15,7 @@ public class DataListeners implements Listener {
         ChallengesData.save();
         SpectatorManager.save();
         ChallengesData.save();
+        StructureUtils.save();
 
         try {
             de.lioncraft.lionutils.utils.status.StatusSettings.serializeAll();
