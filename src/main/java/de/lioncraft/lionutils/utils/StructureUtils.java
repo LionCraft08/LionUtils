@@ -63,6 +63,7 @@ public class StructureUtils
                 StructureProtectionListeners.setStructureProtectionListeners((List<StructureProtectionListeners>) o);
             }
         }
+        ResetUtils.addFileToReset(dataFile);
     }
     public static void createStructure(Location center, StructureRotation rotation){
         Location corner = getCenteredOrigin(center, rotation, structure);
