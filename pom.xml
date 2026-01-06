@@ -6,7 +6,7 @@
 
   <groupId>de.lioncraft</groupId>
   <artifactId>LionUtils</artifactId>
-  <version>1.6.2</version>
+  <version>1.6.3</version>
   <packaging>jar</packaging>
 
   <name>LionUtils</name>
@@ -105,7 +105,13 @@
       <dependency>
           <groupId>de.lioncraft</groupId>
           <artifactId>lionAPI</artifactId>
-          <version>1.10.5</version>
+          <version>1.10.9</version>
+          <scope>provided</scope>
+      </dependency>
+      <dependency>
+          <groupId>net.dmulloy2</groupId>
+          <artifactId>ProtocolLib</artifactId>
+          <version>5.4.0</version>
           <scope>provided</scope>
       </dependency>
   </dependencies>

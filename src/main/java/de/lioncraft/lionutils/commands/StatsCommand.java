@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class StatsCommand implements TabExecutor {
     @Override
@@ -85,13 +86,20 @@ public class StatsCommand implements TabExecutor {
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        return switch (args.length){
+        List<String> list = new ArrayList<>();
+        list = switch (args.length){
             case 1 -> List.of("get");
             case 2 -> getList();
             case 3 -> getArgs(args[1]);
             case 4 -> null;
             default -> new ArrayList<>();
         };
+
+        list = new ArrayList<>(Objects.requireNonNullElse(list, new ArrayList<>()));
+
+        if (args.length == 0 || args[args.length-1].isBlank()) return list;
+        list.removeIf(s -> !s.startsWith(args[args.length-1]));
+        return list;
     }
     private static List<String> getArgs(String s){
         try{

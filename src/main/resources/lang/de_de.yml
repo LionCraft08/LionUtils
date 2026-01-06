@@ -26,3 +26,11 @@ command.status.set_new: "<info>Willkommen <#FFFFFF><0>"
 command.status.not_found: "<error>Dieser Status existiert nicht"
 command.status.enabled: "<info>Dein Status wurde <#00CC00>aktiviert"
 command.status.disabled: "<info>Dein Status wurde <red>deaktiviert"
+
+
+inv.hardcoremc.show_hearts.short: "<info>Zeige Hardcore Herzen an"
+inv.hardcoremc.show_hearts.tooltip: "<info>Ob Hardcore Herzen angezeigt werden \n<info>Beeinflusst nicht das Spiel\n<info>Benötigt ProtocolLib\n<info>Hearts will display after a relog"
+inv.hardcoremc.regeneration_mode.short: "<info>Regenerierungs-Modus"
+inv.hardcoremc.regeneration_mode.tooltip: "<info>Wie Herzen regeneriert werden \n <white>Kann sein: \n Wie in Vanilla (Normal), \n<white> ohne natürliche Regeneration (Effects)\n<white> oder deaktiviert/Regeneration unmöglich (None)"
+inv.hardcoremc.description: "<gradient:#FF0000:#FF9900>HardcoreMC"
+inv.hardcoremc.tooltip: "<info>Alles was Minecraft schwerer macht"

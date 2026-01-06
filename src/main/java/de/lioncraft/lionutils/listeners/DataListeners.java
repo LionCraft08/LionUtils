@@ -1,6 +1,8 @@
 package de.lioncraft.lionutils.listeners;
 
 import de.lioncraft.lionapi.events.saveDataEvent;
+import de.lioncraft.lionutils.addons.CommandUtilsAddon;
+import de.lioncraft.lionutils.addons.hardcoremc.HardcoreMCAddon;
 import de.lioncraft.lionutils.data.ChallengesData;
 import de.lioncraft.lionutils.utils.StructureUtils;
 import de.lioncraft.lionutils.utils.spectator.SpectatorManager;
@@ -16,6 +18,8 @@ public class DataListeners implements Listener {
         SpectatorManager.save();
         ChallengesData.save();
         StructureUtils.save();
+        CommandUtilsAddon.save();
+        HardcoreMCAddon.save();
 
         try {
             de.lioncraft.lionutils.utils.status.StatusSettings.serializeAll();

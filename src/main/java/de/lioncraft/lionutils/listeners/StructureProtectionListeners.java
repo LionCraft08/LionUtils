@@ -1,8 +1,11 @@
 package de.lioncraft.lionutils.listeners;
 
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
+import de.lioncraft.lionapi.events.timerEvents.TimerLikeResumeEvent;
 import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
 import de.lioncraft.lionutils.Main;
+import de.lioncraft.lionutils.utils.StructureUtils;
+import io.papermc.paper.event.player.AsyncPlayerSpawnLocationEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -73,18 +76,39 @@ public class StructureProtectionListeners implements Listener, ConfigurationSeri
         return loc.toVector().isInAABB(pos1, pos2);
     }
 
+    @EventHandler
+    public void onStart(TimerLikeResumeEvent e) {
+        StructureUtils.setEntrance(true);
+    }
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e) {
         if (respawnLocation == null) {return;}
+        if (e.isBedSpawn()||e.isAnchorSpawn()) {return;}
         e.setRespawnLocation(respawnLocation);
+    }
+
+    @EventHandler
+    public void onSpawn(AsyncPlayerSpawnLocationEvent e) {
+        if (respawnLocation == null) return;
+
+        // Redirect if it's their first time OR if they are spawning at the default world spawn
+        if (e.isNewPlayer() || isAtWorldSpawn(e.getSpawnLocation())) {
+            e.setSpawnLocation(respawnLocation);
+        }
+    }
+
+    private boolean isAtWorldSpawn(Location loc) {
+        Location worldSpawn = loc.getWorld().getSpawnLocation();
+        return loc.getBlockX() == worldSpawn.getBlockX() &&
+                loc.getBlockZ() == worldSpawn.getBlockZ();
     }
 
     // --- PLAYER & WORLD INTERACTION ---
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        if (event.getPlayer().getGameMode() == GameMode.CREATIVE) return;
+        if (event.getPlayer().getGameMode() == GameMode.CREATIVE && Main.getPlugin().getConfig().getBoolean("structure.allow-edits-in-creative")) return;
         if (isWithinProtectedArea(event.getBlock().getLocation())) {
             event.setCancelled(true);
         }
@@ -92,7 +116,7 @@ public class StructureProtectionListeners implements Listener, ConfigurationSeri
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent event) {
-        if (event.getPlayer().getGameMode() == GameMode.CREATIVE) return;
+        if (event.getPlayer().getGameMode() == GameMode.CREATIVE && Main.getPlugin().getConfig().getBoolean("structure.allow-edits-in-creative")) return;
         if (isWithinProtectedArea(event.getBlock().getLocation())) {
             event.setCancelled(true);
         }

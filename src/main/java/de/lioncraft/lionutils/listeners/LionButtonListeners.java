@@ -3,6 +3,7 @@ package de.lioncraft.lionutils.listeners;
 import de.lioncraft.lionapi.events.invs.LionButtonClickEvent;
 import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
 import de.lioncraft.lionapi.playerSettings.PlayerSettings;
+import de.lioncraft.lionutils.addons.hardcoremc.HardcoreMCConfigUI;
 import de.lioncraft.lionutils.inventories.ChallengesGUI;
 import de.lioncraft.lionutils.inventories.DamageDisplay;
 import de.lioncraft.lionutils.inventories.PlayerSettingsGUI;

@@ -20,11 +20,14 @@ import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CommandUtilsAddon extends AbstractAddon {
-    static final File filePath = new File(Main.getPlugin().getDataFolder(), "commandutils_addon.yml");
+    static final File filePath = new File(Main.getPlugin().getDataFolder(), "addons\\commandutils_addon.yml");
+    static final File legacyFilePath = new File(Main.getPlugin().getDataFolder(), "commandutils_addon.yml");
 
     private static final CommandUtilsAddon instance = new CommandUtilsAddon();
     private final BasicSettings settings;
@@ -33,11 +36,17 @@ public class CommandUtilsAddon extends AbstractAddon {
         super("command_utils", MiniMessage.miniMessage().deserialize("<gradient:#228B22:#9ACD32>CommandUtils"));
         super.setUseOwnChannel(true);
         if (!filePath.exists()){
+            filePath.getParentFile().mkdirs();
             try {
-                filePath.createNewFile();
+                if (legacyFilePath.exists()){
+                    Files.copy(legacyFilePath.toPath(), filePath.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                }else filePath.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+        }
+        if (legacyFilePath.exists()){
+            legacyFilePath.delete();
         }
         settings = new BasicSettings(YamlConfiguration.loadConfiguration(filePath),
                 new ArrayList<>(List.of(
@@ -91,13 +100,6 @@ public class CommandUtilsAddon extends AbstractAddon {
     @Override
     protected void onUnload() {
         unloadEvents();
-        YamlConfiguration config = YamlConfiguration.loadConfiguration(filePath);
-        settings.saveTo(config);
-        try {
-            config.save(filePath);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
@@ -107,5 +109,15 @@ public class CommandUtilsAddon extends AbstractAddon {
 
     private static Component get(String miniMessage){
         return MiniMessage.miniMessage().deserialize(miniMessage);
+    }
+
+    public static void save(){
+        YamlConfiguration config = YamlConfiguration.loadConfiguration(filePath);
+        getInstance().settings.saveTo(config);
+        try {
+            config.save(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

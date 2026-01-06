@@ -1,5 +1,5 @@
 name: LionUtils
-version: '1.6.2'
+version: '1.6.3'
 main: de.lioncraft.lionutils.Main
 api-version: '1.20'
 load: STARTUP
@@ -69,3 +69,5 @@ permissions:
 
 depend:
   - lionAPI
+softdepend:
+  - ProtocolLib

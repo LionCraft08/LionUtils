@@ -69,3 +69,5 @@ permissions:
 
 depend:
   - lionAPI
+softdepend:
+  - ProtocolLib
