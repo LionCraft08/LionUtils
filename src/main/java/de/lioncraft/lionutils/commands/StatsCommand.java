@@ -1,6 +1,10 @@
 package de.lioncraft.lionutils.commands;
 
+import de.lioncraft.lionapi.LionAPI;
 import de.lioncraft.lionapi.messageHandling.DM;
+import de.lioncraft.lionapi.messageHandling.MSG;
+import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
+import de.lioncraft.lionutils.Main;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Bukkit;
@@ -25,12 +29,12 @@ public class StatsCommand implements TabExecutor {
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         Statistic s;
         OfflinePlayer p = null;
-        if(args.length < 2) sender.sendMessage(DM.wrongArgs);
+        if(args.length < 2) LionChat.sendSystemMessage(MSG.WRONG_ARGS, sender);
         else if (args.length <= 4) {
             try {
                 s = Statistic.valueOf(args[1]);
             }catch (IllegalArgumentException e){
-                sender.sendMessage(DM.error("This Statistic does not exist!"));
+                LionChat.sendSystemMessage(Main.lm().msg("command.statistic.not_existing"), sender);
                 return true;
             }
             if(sender instanceof Player player) p = player;
@@ -44,7 +48,7 @@ public class StatsCommand implements TabExecutor {
                     }
                 }
                 if(p == null){
-                    sender.sendMessage(DM.noPlayer);
+                    LionChat.sendSystemMessage(MSG.NO_PLAYER, sender);
                     return true;
                 }
                 try {
@@ -56,7 +60,7 @@ public class StatsCommand implements TabExecutor {
                         try {
                             value = p.getStatistic(s);
                         }catch (IllegalArgumentException e3){
-                            sender.sendMessage(DM.error(args[1] + " doesn't accept " + args[2] + " as arguments!"));
+                            LionChat.sendSystemMessage(Main.lm().msg("command.statistic.wrong_argument", args[1], args[2]), sender);
                             return true;
                         }
                     }
@@ -66,19 +70,19 @@ public class StatsCommand implements TabExecutor {
                     try {
                         value = p.getStatistic(s);
                     }catch (IllegalArgumentException e){
-                        sender.sendMessage(DM.error("Specify args for the Statistic (Entity, Item or Block)"));
+                        LionChat.sendSystemMessage(Main.lm().msg("command.statistic.no_args"), sender);
                         return true;
                     }
                 }else{
-                    sender.sendMessage(DM.notAPlayer);
+                    LionChat.sendSystemMessage(MSG.NOT_A_PLAYER, sender);
                     return true;
                 }
             }
             if(value != -1){
-                sender.sendMessage(DM.info(Component.text(p.getName()).append(Component.text(" hat den Wert ")).append(Component.text(value, TextColor.color(255, 0, 128))).append(Component.text(" für ", TextColor.color(255, 255, 255))).append(Component.text(s.toString(), TextColor.color(255, 0, 128)))));
-            }else sender.sendMessage(DM.commandError);
+                LionChat.sendSystemMessage(Main.lm().msg("command.statistic.result", p.getName(), ""+value, s.toString()), sender);
+            }else LionChat.sendSystemMessage(MSG.COMMAND_ERROR, sender);
 
-        }else sender.sendMessage(DM.wrongArgs);
+        }else LionChat.sendSystemMessage(MSG.WRONG_ARGS, sender);
 
 
         return true;

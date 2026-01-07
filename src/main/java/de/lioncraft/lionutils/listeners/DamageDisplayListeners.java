@@ -55,14 +55,14 @@ public class DamageDisplayListeners implements Listener {
             DamageDisplay.getDamageDisplay().updateTabListDelayed(e.getPlayer());
         }
     }
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onJoin(EntityRegainHealthEvent e){
         if (e.getEntity() instanceof Player p)
             if(DamageDisplay.getDamageDisplay().isTabListActive()){
                 DamageDisplay.getDamageDisplay().updateTabListDelayed(p);
             }
     }
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onJoin(EntityDamageEvent e){
         if (e.getEntity() instanceof Player p)
             if(DamageDisplay.getDamageDisplay().isTabListActive()){

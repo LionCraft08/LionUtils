@@ -5,6 +5,7 @@ import de.lioncraft.lionapi.playerSettings.PlayerSettings;
 import de.lioncraft.lionapi.velocity.connections.ConnectionManager;
 import de.lioncraft.lionutils.Main;
 import de.lioncraft.lionutils.messages.MessageSender;
+import de.lioncraft.lionutils.utils.GUIElementRenderer;
 import de.lioncraft.lionutils.utils.MOTD;
 import de.lioncraft.lionutils.utils.MainChatMessageRenderer;
 import io.papermc.paper.chat.ChatRenderer;
@@ -43,6 +44,7 @@ public class ChatListeners implements Listener {
     public void onJoin(PlayerJoinEvent e){
         e.joinMessage(Component.text("+ >>", TextColor.color(0 ,255, 0), TextDecoration.BOLD).append(Component.text(" ", TextColor.color(255, 255, 255)).append(e.getPlayer().displayName())));
         if (!ConnectionManager.isConnectedToVelocity()){
+            GUIElementRenderer.update();
             for(Player p : Bukkit.getServer().getOnlinePlayers()){
                 MessageSender.sendFooter(p);
             }
@@ -55,10 +57,12 @@ public class ChatListeners implements Listener {
     @EventHandler
     public void onLeave(PlayerQuitEvent e){
         e.quitMessage(Component.text("- <<", TextColor.color(255 ,70, 0), TextDecoration.BOLD).append(Component.text(" ", TextColor.color(255, 255, 255)).append(e.getPlayer().displayName())));
-        if (!ConnectionManager.isConnectedToVelocity())
-            for(Player p : Bukkit.getServer().getOnlinePlayers()){
+        if (!ConnectionManager.isConnectedToVelocity()) {
+            GUIElementRenderer.update();
+            for (Player p : Bukkit.getServer().getOnlinePlayers()) {
                 if (p != e.getPlayer()) MessageSender.sendFooter(p);
             }
+        }
     }
 
     @EventHandler

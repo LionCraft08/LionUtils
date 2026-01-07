@@ -1,4 +1,6 @@
 tablist.header01: "<gradient:#0070FF:#00FFFF>LionSystems Server Network"
+tablist.divider: "<gradient:#FF00FF:#00FFFF>-----------------------------"
+tablist.footer: "<#00FFFF>Server: <0>\n\n<u><#00C8FF>Network</u>\n\n<#0064FF>Players: <1>           Server: 1\n"
 
 command.structure.placed: "<#66FF66>Successfully placed the Structure"
 command.structure.doors_opened: "<#66FF66>Successfully <#00FF00>opened<#66FF66> the doors of the structure"
@@ -27,9 +29,22 @@ command.status.not_found: "<error>Could not find that status"
 command.status.enabled: "<info>Enabled your status"
 command.status.disabled: "<info>Disabled your status"
 
+command.statistic.not_existing: "<error>This Statistic does not exist"
+command.statistic.wrong_argument: "<error><0> doesn't accept <1> as argument"
+command.statistic.no_args: "<error>Specify args for the Statistic (Entity, Item or Block)"
+command.statistic.result: "<important>The Statistic <1> has the value <2> for <0>"
+
 inv.hardcoremc.show_hearts.short: "<info>Show Hardcore Hearts"
 inv.hardcoremc.show_hearts.tooltip: "<info>Whether to show hardcore hearts \n<info>Does not affect Gameplay\n<info>Requires ProtocolLib\n<info>Hearts will display after a relog"
 inv.hardcoremc.regeneration_mode.short: "<info>Regeneration Mode"
 inv.hardcoremc.regeneration_mode.tooltip: "<info>The ways to regenerate Hearts \n Can be as in vanilla (Normal), \n without natural regeneration (Effects)\n or disabled (None)"
 inv.hardcoremc.description: "<gradient:#FF0000:#FF9900>HardcoreMC"
 inv.hardcoremc.tooltip: "<info>Everything that makes minecraft harder"
+
+inv.sharedhearts.name: "<gradient:#FF9900:#FF3300>Shared Hearts"
+inv.sharedhearts.lore: "<white>Shared Hearts between players"
+inv.sharedhearts.forceglobal.title: "<white>Force Global Shared Hearts"
+inv.sharedhearts.forceglobal.lore: "<white>Forces Hearts to be shared global\n and ignore Teams"
+inv.sharedhearts.sync-damage-only.title: "<white>Sync Damage Only"
+inv.sharedhearts.sync-damage-only.lore: "<white>Syncs only the Damage, \n not the regeneration"
+

@@ -46,10 +46,8 @@ public final class opUtils {
         inv.setItem(12, LionButtonFactory.createButton(Items.get(Component.text("Teleport"), Material.ENDER_PEARL, "Teleports every Player to you"),
                 "lionutils_tp"));
 
-        inv.setItem(14, LionButtonFactory.createButton(Items.get("Challenges", Material.DIAMOND_SWORD, "Different small Challenges"),
-                "lionutils_challenges"));
 
-        inv.setItem(16, LionButtonFactory.createButton(Items.get(Component.text("Player Management", TextColor.color(0, 255, 255)),
+        inv.setItem(14, LionButtonFactory.createButton(Items.get(Component.text("Player Management", TextColor.color(0, 255, 255)),
                 Material.PLAYER_HEAD, "Opens a GUI to manage Player Abilities"),
                 "lionutils_player_management"));
 

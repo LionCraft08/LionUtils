@@ -1,4 +1,6 @@
 tablist.header01: "<gradient:#0070FF:#00FFFF>LionSystems Server Netzwerk"
+tablist.divider: "<gradient:#FF00FF:#00FFFF>-----------------------------"
+tablist.footer: "<#00FFFF>Server: <0>\n\n<u><#00C8FF>Netzwerk</u>\n\n<#0064FF>Spieler: <1>           Server: 1\n"
 
 command.structure.placed: "<#66FF66>Die Struktur wurde erfolgreich platziert"
 command.structure.doors_opened: "<#66FF66>Die Türen der Struktur wurden erfolgreich <#00FF00>geöffnet"
@@ -27,6 +29,10 @@ command.status.not_found: "<error>Dieser Status existiert nicht"
 command.status.enabled: "<info>Dein Status wurde <#00CC00>aktiviert"
 command.status.disabled: "<info>Dein Status wurde <red>deaktiviert"
 
+command.statistic.not_existing: "<error>Diese Statistik existiert nicht"
+command.statistic.wrong_argument: "<error>Die Statistik <0> akzeptiert <1> nicht als Argument"
+command.statistic.no_args: "<error>Diese Statistik benötigt genauere Argumente (Entity, Item oder Block)"
+command.statistic.result: "<important>Die Statistik <1> hat den Wert <2> für <0>"
 
 inv.hardcoremc.show_hearts.short: "<info>Zeige Hardcore Herzen an"
 inv.hardcoremc.show_hearts.tooltip: "<info>Ob Hardcore Herzen angezeigt werden \n<info>Beeinflusst nicht das Spiel\n<info>Benötigt ProtocolLib\n<info>Hearts will display after a relog"
@@ -34,3 +40,5 @@ inv.hardcoremc.regeneration_mode.short: "<info>Regenerierungs-Modus"
 inv.hardcoremc.regeneration_mode.tooltip: "<info>Wie Herzen regeneriert werden \n <white>Kann sein: \n Wie in Vanilla (Normal), \n<white> ohne natürliche Regeneration (Effects)\n<white> oder deaktiviert/Regeneration unmöglich (None)"
 inv.hardcoremc.description: "<gradient:#FF0000:#FF9900>HardcoreMC"
 inv.hardcoremc.tooltip: "<info>Alles was Minecraft schwerer macht"
+
+inv.sharedhearts.name: "<gradient:#FF9900:#FF3300>Geteilte Herzen"

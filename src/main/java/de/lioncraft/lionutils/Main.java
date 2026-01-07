@@ -5,7 +5,6 @@ import de.lioncraft.lionapi.LionAPI;
 import de.lioncraft.lionapi.addons.AddonManager;
 import de.lioncraft.lionapi.data.ConfigManager;
 import de.lioncraft.lionapi.events.saveDataEvent;
-import de.lioncraft.lionapi.guimanagement.Interaction.Button;
 import de.lioncraft.lionapi.guimanagement.Interaction.LionButtonFactory;
 import de.lioncraft.lionapi.guimanagement.Items;
 import de.lioncraft.lionapi.guimanagement.MainMenu;
@@ -16,11 +15,11 @@ import de.lioncraft.lionapi.velocity.connections.ConnectionManager;
 import de.lioncraft.lionutils.addons.CommandUtilsAddon;
 import de.lioncraft.lionutils.addons.hardcoremc.HardcoreMCAddon;
 import de.lioncraft.lionutils.addons.hardcoremc.ProtocolListener;
-import de.lioncraft.lionutils.data.ChallengesData;
+import de.lioncraft.lionutils.addons.sharedhearts.SharedHeartsAddon;
+import de.lioncraft.lionutils.addons.sharedhearts.SharedHeartsListeners;
 import de.lioncraft.lionutils.inventories.DamageDisplay;
 import de.lioncraft.lionutils.commands.*;
 import de.lioncraft.lionutils.commands.Status;
-import de.lioncraft.lionutils.inventories.opUtils;
 import de.lioncraft.lionutils.listeners.*;
 import de.lioncraft.lionutils.utils.GUIElementRenderer;
 import de.lioncraft.lionutils.utils.ResetUtils;
@@ -35,9 +34,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.server.ServerLoadEvent;
-import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -46,12 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 
 public final class Main extends JavaPlugin implements Listener {
 
@@ -89,7 +81,6 @@ public final class Main extends JavaPlugin implements Listener {
         ConfigurationSerialization.registerClass(GlobalStatus.class);
         ConfigurationSerialization.registerClass(DamageDisplay.class);
         ConfigurationSerialization.registerClass(StatusPart.class);
-        ConfigurationSerialization.registerClass(ChallengesData.class);
         ConfigurationSerialization.registerClass(StructureProtectionListeners.class);
 
         getServer().getPluginManager().registerEvents(new StatusListeners(), this);
@@ -100,7 +91,6 @@ public final class Main extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new AnvilFixes(), this);
         getServer().getPluginManager().registerEvents(new DamageDisplayListeners(), this);
         getServer().getPluginManager().registerEvents(new StartupListener(), this);
-        getServer().getPluginManager().registerEvents(new SharedHeartsListeners(), this);
         getServer().getPluginManager().registerEvents(new LionButtonListeners(), this);
 
         getCommand("ping").setExecutor(new Ping());
@@ -113,8 +103,10 @@ public final class Main extends JavaPlugin implements Listener {
 
         AddonManager.registerAddon(CommandUtilsAddon.getInstance());
         AddonManager.registerAddon(HardcoreMCAddon.getInstance());
+        AddonManager.registerAddon(SharedHeartsAddon.getInstance());
 
         SpectatorManager.init();
+        GUIElementRenderer.init();
 
 
         MainMenu.setButton(14, LionButtonFactory.createButton(Items.get("Status", Material.NAME_TAG, "Click to configure your status."),
@@ -133,7 +125,7 @@ public final class Main extends JavaPlugin implements Listener {
         Bukkit.getScheduler().runTaskTimer(this, () -> {
             if (ConnectionManager.isConnectedToVelocity()) return;
             for (Player p : Bukkit.getOnlinePlayers()) {
-                p.sendPlayerListHeader(GUIElementRenderer.getHeader("Europe/Berlin"));
+                p.sendPlayerListHeader(GUIElementRenderer.getHeader());
             }
         }, (60 - Calendar.getInstance().get(Calendar.SECOND)) * 20, 20 * 60);
 

@@ -1,13 +1,14 @@
-package de.lioncraft.lionutils.listeners;
+package de.lioncraft.lionutils.addons.sharedhearts;
 
 import de.lioncraft.lionapi.listeners.SimpleChallengeRelatedListeners;
 import de.lioncraft.lionapi.teams.Team;
-import de.lioncraft.lionutils.data.ChallengesData;
+import de.lioncraft.lionutils.inventories.DamageDisplay;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
@@ -20,23 +21,23 @@ import java.util.Objects;
 public class SharedHeartsListeners implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent e){
-        if (!ChallengesData.getInstance().isSharedHearts()) return;
         if (e.getEntity() instanceof Player p) {
-            List<Player> list = new ArrayList<>();
-            if (ChallengesData.getInstance().isGlobalShared()) {
-                list.addAll(Bukkit.getOnlinePlayers());
-            } else {
-                Team t = Team.getTeam(p);
-                if (t != null) t.getPlayers().forEach(player -> {
-                    if (player.isOnline()){
-                        list.add(player.getPlayer());
-                    }
-                });
-            }
+            List<Player> list = new ArrayList<>(SharedHeartsAddon.getInstance().getAffectedPlayers(p));
+
+            //Set the player for the Simple Challenge (LionAPI) to the one that actually got damaged here
+            //as the following Method would kill the other Players before this one.
+            //this is important, as otherwise the Text Message 'which player died' would display the wrong Player.
             if (p.getHealth()-e.getFinalDamage()<=0) SimpleChallengeRelatedListeners.PlayerThatDied = p.getName();
+
             for (Player player : list){
                 if (player == p) continue;
-                player.setHealth(getValue(p.getHealth()-e.getFinalDamage()));
+                if (SharedHeartsAddon.getInstance().getSettings().getBoolValue("sync-damage-only"))
+                    player.setHealth(getValue(player.getHealth()-e.getFinalDamage()));
+                else
+                    player.setHealth(getValue(p.getHealth()-e.getFinalDamage()));
+                if(DamageDisplay.getDamageDisplay().isTabListActive()){
+                    DamageDisplay.getDamageDisplay().updateTabListDelayed(player);
+                }
                 player.playSound(Sound.sound(Key.key("entity.player.hurt"), Sound.Source.PLAYER, 0.5f, 1.1f));
             }
         }
@@ -46,23 +47,23 @@ public class SharedHeartsListeners implements Listener {
         if (d > 20) return 20;
         return d;
     }
-    @EventHandler
+
+    private boolean isGlobal(Player p){
+        return SharedHeartsAddon.getInstance().getSettings().getBoolValue("force-global");
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
     public void onRegain(EntityRegainHealthEvent e){
-        if (!ChallengesData.getInstance().isSharedHearts()) return;
+        if (SharedHeartsAddon.getInstance().getSettings().getBoolValue("sync-damage-only")) return;
+        if (e.isCancelled()) return;
         if (e.getEntity() instanceof Player p) {
             int lastRegenTick = 0;
-            List<Player> list = new ArrayList<>();
-            if (ChallengesData.getInstance().isGlobalShared()) {
+            List<Player> list = new ArrayList<>(SharedHeartsAddon.getInstance().getAffectedPlayers(p));
+            if (isGlobal(p)) {
                 lastRegenTick = lastGlobalRegen;
-                list.addAll(Bukkit.getOnlinePlayers());
             } else {
                 Team t = Team.getTeam(p);
                 lastRegenTick = Objects.requireNonNullElse(lastTeamRegen.get(t), 0);
-                if (t != null) t.getPlayers().forEach(player -> {
-                    if (player.isOnline()){
-                        list.add(player.getPlayer());
-                    }
-                });
             }
             if (e.getRegainReason().equals(EntityRegainHealthEvent.RegainReason.SATIATED)){
                 int sinceLastRegen = Bukkit.getServer().getCurrentTick()-lastRegenTick;
@@ -81,8 +82,11 @@ public class SharedHeartsListeners implements Listener {
             for (Player player : list){
                 if (player == p) continue;
                 player.setHealth(getValue(p.getHealth()+e.getAmount()));
+                if(DamageDisplay.getDamageDisplay().isTabListActive()){
+                    DamageDisplay.getDamageDisplay().updateTabListDelayed(player);
+                }
             }
-            if (ChallengesData.getInstance().isGlobalShared()){
+            if (isGlobal(p)){
                 lastGlobalRegen = Bukkit.getServer().getCurrentTick();
             }else{
                 lastTeamRegen.put(Team.getTeam(p), Bukkit.getServer().getCurrentTick());

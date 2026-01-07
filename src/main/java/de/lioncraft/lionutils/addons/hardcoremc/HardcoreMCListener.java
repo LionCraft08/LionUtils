@@ -1,6 +1,7 @@
 package de.lioncraft.lionutils.addons.hardcoremc;
 
 import com.destroystokyo.paper.event.player.PlayerAttackEntityCooldownResetEvent;
+import de.lioncraft.lionutils.addons.sharedhearts.SharedHeartsAddon;
 import org.bukkit.Bukkit;
 import org.bukkit.GameRule;
 import org.bukkit.attribute.Attribute;
@@ -19,9 +20,15 @@ public class HardcoreMCListener implements Listener {
         if (event.getEntity() instanceof Player p){
             switch (HardcoreMCAddon.getInstance().getSettings().getStringValue("regeneration_mode")){
                 case "NONE" -> {
-                    if (p.getAttribute(Attribute.MAX_HEALTH) == null)
-                        p.registerAttribute(Attribute.MAX_HEALTH);
-                    p.getAttribute(Attribute.MAX_HEALTH).setBaseValue(p.getHealth()-event.getFinalDamage());
+                    setMaxHealth(p, p.getHealth()-event.getFinalDamage());
+                    for (Player player : SharedHeartsAddon.getInstance().getAffectedPlayers(p)){
+                        if (player != p){
+                            setMaxHealth(player, p.getHealth()-event.getFinalDamage());
+                        }
+                    }
+//                    if (p.getAttribute(Attribute.MAX_HEALTH) == null)
+//                        p.registerAttribute(Attribute.MAX_HEALTH);
+//                    p.getAttribute(Attribute.MAX_HEALTH).setBaseValue();
                 }
             }
         }
@@ -40,6 +47,11 @@ public class HardcoreMCListener implements Listener {
             switch (HardcoreMCAddon.getInstance().getSettings().getStringValue("regeneration_mode")){
                 case "NONE" -> {
                     setMaxHealth(p, p.getHealth());
+                    for (Player player : SharedHeartsAddon.getInstance().getAffectedPlayers(p)){
+                        if (player != p){
+                            setMaxHealth(player, p.getHealth());
+                        }
+                    }
                 }
                 case "EFFECTS" -> {
                     if (event.getRegainReason() == EntityRegainHealthEvent.RegainReason.SATIATED) {

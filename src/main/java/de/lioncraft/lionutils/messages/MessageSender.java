@@ -10,9 +10,9 @@ import java.util.TimeZone;
 public final class MessageSender {
     private MessageSender(){}
     public static void sendHeader(Audience a){
-        a.sendPlayerListHeader(GUIElementRenderer.getHeader(TimeZone.getDefault().getID()));
+        a.sendPlayerListHeader(GUIElementRenderer.getHeader());
     }
     public static void sendFooter(Player p){
-        p.sendPlayerListFooter(GUIElementRenderer.getFooter("Survival 01"));
+        p.sendPlayerListFooter(GUIElementRenderer.getFooter());
     }
 }

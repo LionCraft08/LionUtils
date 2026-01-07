@@ -4,7 +4,7 @@ import de.lioncraft.lionapi.events.invs.LionButtonClickEvent;
 import de.lioncraft.lionapi.messageHandling.lionchat.LionChat;
 import de.lioncraft.lionapi.playerSettings.PlayerSettings;
 import de.lioncraft.lionutils.addons.hardcoremc.HardcoreMCConfigUI;
-import de.lioncraft.lionutils.inventories.ChallengesGUI;
+import de.lioncraft.lionutils.addons.sharedhearts.SharedHeartsAddon;
 import de.lioncraft.lionutils.inventories.DamageDisplay;
 import de.lioncraft.lionutils.inventories.PlayerSettingsGUI;
 import de.lioncraft.lionutils.inventories.opUtils;
@@ -38,7 +38,7 @@ public class LionButtonListeners implements Listener {
                 e.getPlayer().playSound(e.getPlayer(), Sound.BLOCK_BEACON_ACTIVATE, 1.5f, 1.5f);
 
             }
-            case "lionutils_challenges"-> ChallengesGUI.open(e.getPlayer());
+            case "lionutils_challenges"-> SharedHeartsAddon.getInstance().openConfigMenu(e.getPlayer());
             case "lionutils_tp" -> {
                 Player clicker = e.getPlayer();
                 int i = 0;
