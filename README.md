@@ -56,3 +56,10 @@ Use the /structure command to
 - teleport players into the structure
 - set the strucutre's center as world spawn
 </details>
+<details>
+<summary>HardcoreMC</summary>
+Use this addon to
+- Display hearts as Hardcore (visual only, does not change Gamplay and requires ProtocolLib)
+- Set regeneration Mode to Vanilla, without natural regeneration or None
+- Change the default health to be half a heart
+</details>
