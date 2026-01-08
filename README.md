@@ -63,3 +63,11 @@ Use this addon to
 - Set regeneration Mode to Vanilla, without natural regeneration or None
 - Change the default health to be half a heart
 </details>
+
+<details>
+<summary>Shared Hearts</summary>
+Use this addon to
+- Enable shared Hearts in teams 
+- Change heart sharing to global to ignore teams 
+- Sync Damage Only
+</details>
